@@ -9,22 +9,33 @@
 <body>
 
   <!-- TOP NAVIGATION BAR -->
-  <header class="navbar">
-    <div class="container navbar-container">
-      <a href="index.html" class="brand-logo">
-        <img src="assets/logo-speakoffice.png" alt="Logo SpeakOffice">
+  <header class="navbar" style="background: #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 12px 0; position: sticky; top: 0; z-index: 1000;">
+    <div class="container navbar-container" style="display: flex; align-items: center; justify-content: space-between;">
+      
+      <!-- LOGO (DENGAN EFEK KLIK MEMBAL) -->
+      <a href="index.html" class="brand-logo" id="logoBtn" style="cursor: pointer; text-decoration: none;">
+        <img src="assets/logobesar.png" alt="Logo SpeakOffice" style="height: 48px; width: auto; display: block;">
       </a>
 
-      <nav class="nav-links">
+      <!-- MENU NAVIGASI (DENGAN GARIS MELEBAR) -->
+      <nav class="nav-links" style="display: flex; gap: 24px; align-items: center;">
         <a href="index.html" class="nav-link active">Beranda</a>
         <a href="pages/case-study.html" class="nav-link">Interactive Case Study</a>
         <a href="pages/phrasebook.html" class="nav-link">Phrasebook</a>
         <a href="pages/etiquette.html" class="nav-link">Visual Etiquette</a>
+        <a href="pages/about.html" class="nav-link">About Us</a>
       </nav>
 
-      <div class="nav-actions">
-        <a href="pages/phrasebook.html" class="icon-btn" title="Cari Frasa Kantor">🔍</a>
-        <div class="icon-btn" title="Profil Mahasiswa">👤</div>
+      <!-- AKSI KANAN -->
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px; position: relative;">
+        <a href="pages/teacher-dashboard.html" class="icon-btn" title="Mode Guru (Dashboard Pengajar)" style="text-decoration: none; font-size: 1.25rem; background: #FEF3C7; border: 1.5px solid #FCD34D; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%;">
+  👨‍🏫
+</a>
+        <a href="pages/phrasebook.html#searchInput" class="icon-btn" title="Cari Frasa Kantor" style="text-decoration: none; font-size: 1.2rem; background: #EFF6FF; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">🔍</a>
+        <a href="pages/profile.html" class="icon-btn" title="Buka Profil Siswa" style="text-decoration: none; font-size: 1.2rem; background: #EFF6FF; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; position: relative;">
+          👤
+          <span style="position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background: #22c55e; border: 2px solid #fff; border-radius: 50%;"></span>
+        </a>
       </div>
     </div>
   </header>
@@ -48,35 +59,42 @@
           </a>
         </div>
 
+                  <!-- HERO VISUAL (1 VIDEO DENGAN DESKRIPSI RAPI) -->
         <div class="hero-visual">
-          <div class="hero-illustration-card">
-            <div style="background: var(--bg-soft-blue); border-radius: 16px; padding: 32px 24px; text-align: center;">
-              <div style="font-size: 3.5rem; margin-bottom: 12px;">👔 💬 👩‍💼</div>
-              <h3 style="color: var(--color-navy); margin-bottom: 8px;">Simulasi Dunia Kerja Perkantoran</h3>
-              <p style="font-size: 0.9rem; color: var(--text-secondary);">
-                Latih pengambilan keputusan sebagai Staf Administrasi, Sekretaris, Front Office, & Humas secara kontekstual.
-              </p>
+          <div class="hero-illustration-card" style="background: #FFFFFF; border-radius: 18px; padding: 18px; box-shadow: 0 8px 24px rgba(37, 99, 235, 0.08); border: 1px solid #E2E8F0; text-align: center;">
+            
+            <!-- VIDEO CONTAINER -->
+            <div style="overflow: hidden; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06);">
+              <video id="heroVideo" autoplay loop muted playsinline preload="auto" style="width: 100%; max-height: 220px; object-fit: cover; display: block;">
+                <source src="assets/berandavid.mp4" type="video/mp4">
+                Browser kamu tidak mendukung pemutaran video.
+              </video>
             </div>
+
+            <!-- DESKRIPSI MENARIK DI BAWAH VIDEO (FONT RAPI & TIDAK KEBESARAN) -->
+            <h3 style="color: #1E293B; font-size: 1.05rem; font-weight: 700; margin-bottom: 4px;">
+              Simulasi Dunia Kerja Perkantoran
+            </h3>
+            <p style="font-size: 0.8rem; color: #64748B; line-height: 1.45; margin: 0;">
+              Latih pengambilan keputusan sebagai Staf Administrasi, Sekretaris, Front Office, & Humas secara kontekstual.
+            </p>
+
           </div>
         </div>
-      </div>
     </section>
 
     <!-- 3 FITUR UTAMA -->
     <section class="features-section">
       <div class="container features-grid">
-        
-        <!-- Fitur 1: Interactive Case Study -->
         <a href="pages/case-study.html" class="feature-card">
           <div class="feature-icon">💬</div>
           <div class="feature-content" style="width: 100%;">
             <h3>Interactive Case Study</h3>
-            <p>Hadapi 5 skenario kasus nyata di kantor dan uji skor etika komunikasimu.</p>
+            <p>Hadapi 15 skenario kasus nyata di kantor dan uji skor etika komunikasimu.</p>
             <span class="feature-arrow">&rarr;</span>
           </div>
         </a>
 
-        <!-- Fitur 2: Office Phrasebook & Bilingual Glossary -->
         <a href="pages/phrasebook.html" class="feature-card">
           <div class="feature-icon">📖</div>
           <div class="feature-content" style="width: 100%;">
@@ -86,7 +104,6 @@
           </div>
         </a>
 
-        <!-- Fitur 3: Visual Etiquette Check -->
         <a href="pages/etiquette.html" class="feature-card">
           <div class="feature-icon" style="color: var(--color-success); background: var(--bg-success-soft);">👁️</div>
           <div class="feature-content" style="width: 100%;">
@@ -95,7 +112,6 @@
             <span class="feature-arrow">&rarr;</span>
           </div>
         </a>
-
       </div>
     </section>
   </main>
@@ -103,30 +119,29 @@
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
-      <p><strong>SpeakOffice</strong> &copy; 2026 — Kelompok 7 Pendidikan Administrasi Perkantoran, Fakultas Ekonomi dan Bisnis, Universitas Negeri Jakarta.</p>
+      <p>SpeakOffice &copy; 2026 - Speak Professionally, Serve Excellently</p>
     </div>
   </footer>
 
   <!-- MOBILE BOTTOM NAVIGATION -->
   <nav class="bottom-nav">
-    <a href="index.html" class="bottom-nav-item active">
-      <span>🏠</span>
-      <span>Beranda</span>
-    </a>
-    <a href="pages/case-study.html" class="bottom-nav-item">
-      <span>💬</span>
-      <span>Case Study</span>
-    </a>
-    <a href="pages/phrasebook.html" class="bottom-nav-item">
-      <span>📖</span>
-      <span>Phrasebook</span>
-    </a>
-    <a href="pages/etiquette.html" class="bottom-nav-item">
-      <span>👁️</span>
-      <span>Visual</span>
-    </a>
+    <a href="index.html" class="bottom-nav-item active"><span>🏠</span><span>Beranda</span></a>
+    <a href="pages/case-study.html" class="bottom-nav-item"><span>💬</span><span>Case Study</span></a>
+    <a href="pages/phrasebook.html" class="bottom-nav-item"><span>📖</span><span>Phrasebook</span></a>
+    <a href="pages/etiquette.html" class="bottom-nav-item"><span>👁️</span><span>Visual</span></a>
+    <a href="pages/about.html" class="bottom-nav-item"><span>ℹ️</span><span>About</span></a>
   </nav>
 
   <script src="js/main.js"></script>
+  <script>
+    // Memastikan video berputar otomatis
+    window.addEventListener('DOMContentLoaded', () => {
+      const vid = document.getElementById('heroVideo');
+      if (vid) {
+        vid.muted = true;
+        vid.play().catch(err => console.log('Autoplay ditahan browser:', err));
+      }
+    });
+  </script>
 </body>
 </html>

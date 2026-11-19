@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About Us - SPEAKOFFICE</title>
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+  <!-- TOP NAVIGATION BAR (DIPERTAHANKAN) -->
+  <header class="navbar" style="background: #FFFFFF; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 12px 0; position: sticky; top: 0; z-index: 1000;">
+    <div class="container navbar-container" style="display: flex; align-items: center; justify-content: space-between;">
+      <a href="../index.html" class="brand-logo" id="logoBtn" style="cursor: pointer; text-decoration: none;">
+        <img src="../assets/logobesar.png" alt="Logo SpeakOffice" style="height: 48px; width: auto; display: block;">
+      </a>
+      <nav class="nav-links" style="display: flex; gap: 20px; align-items: center;">
+        <a href="../index.html" class="nav-link">Beranda</a>
+        <a href="case-study.html" class="nav-link">Interactive Case Study</a>
+        <a href="phrasebook.html" class="nav-link">Phrasebook</a>
+        <a href="etiquette.html" class="nav-link">Visual Etiquette</a>
+        <a href="about.html" class="nav-link active">About Us</a>
+      </nav>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px; position: relative;">
+        <a href="teacher-dashboard.html" class="icon-btn" title="Mode Guru (Dashboard Pengajar)" style="text-decoration: none; font-size: 1.25rem; background: #FEF3C7; border: 1.5px solid #FCD34D; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%;">
+          👨‍🏫
+        </a>
+        <a href="phrasebook.html#searchInput" class="icon-btn" title="Cari Frasa Kantor" style="text-decoration: none; font-size: 1.2rem; background: var(--bg-soft-blue, #EFF6FF); width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">🔍</a>
+        <a href="profile.html" class="icon-btn" title="Buka Profil Siswa" style="text-decoration: none; font-size: 1.2rem; background: var(--bg-soft-blue, #EFF6FF); width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; position: relative;">
+          👤
+          <span style="position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background: #22c55e; border: 2px solid #fff; border-radius: 50%;"></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- KONTEN ABOUT US -->
+  <main style="padding: 48px 0 60px 0; min-height: 75vh;">
+    <div class="container" style="max-width: 900px;">
+      
+      <!-- HEADER & DESKRIPSI PEMBUKA RESMI -->
+      <div class="about-hero-header">
+        <span class="about-badge">
+          <span class="about-badge-dot"></span>
+          Tentang Kami
+        </span>
+        <h2 class="about-main-title">
+          Mengenal Lebih Dekat SPEAKOFFICE
+        </h2>
+        <p class="about-lead-desc">
+          <strong>SPEAKOFFICE</strong> merupakan media pembelajaran interaktif yang dikembangkan oleh tiga mahasiswa Program Studi Pendidikan Administrasi Perkantoran, Fakultas Ekonomi dan Bisnis, Universitas Negeri Jakarta angkatan 2024.
+        </p>
+      </div>
+
+      <!-- GRID VISI & MISI (DIPISAH MENJADI 2 CARD BERBEDA) -->
+      <div class="vision-mission-grid">
+        
+        <!-- CARD 1: VISI KAMI -->
+        <div class="about-feature-card">
+          <div class="card-top-icon">
+            🎯
+          </div>
+          <h3 class="card-title">Visi Kami</h3>
+          <p class="card-paragraph">
+            Menjadi platform media pembelajaran interaktif yang unggul dan inovatif dalam menjembatani teori akademik dengan praktik nyata di dunia kerja perkantoran korporat, instansi birokrasi, serta pelayanan publik yang beretika dan profesional.
+          </p>
+          <div class="card-highlight-pill">
+            <span>✨ Unggul • Kontekstual • Profesional</span>
+          </div>
+        </div>
+
+        <!-- CARD 2: MISI KAMI -->
+        <div class="about-feature-card">
+          <div class="card-top-icon">
+            🚀
+          </div>
+          <h3 class="card-title">Misi Kami</h3>
+          <ul class="mission-checklist">
+            <li>
+              <span class="check-icon">✓</span>
+              <span>Meningkatkan kompetensi <em>hard skill</em> dan <em>soft skill</em> mahasiswa di bidang administrasi perkantoran modern.</span>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <span>Menyediakan simulasi studi kasus kontekstual berbasis <strong>HOTS</strong> (<em>Higher Order Thinking Skills</em>).</span>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <span>Mengintegrasikan penguasaan kosakata profesional dan <strong>Business English</strong> secara aplikatif.</span>
+            </li>
+            <li>
+              <span class="check-icon">✓</span>
+              <span>Menanamkan panduan visual <em>Do's & Don'ts</em> untuk membangun etika kerja dan sikap profesional.</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- SECTION BARU: HUBUNGI KAMI -->
+      <div class="contact-section-card">
+        <div class="contact-icon-bubble">
+          ✉️
+        </div>
+        <h3 class="contact-title">Hubungi Kami</h3>
+        <p class="contact-subtitle">
+          Punya pertanyaan seputar materi studi kasus, kritik, saran pengembangan media, atau ingin berkolaborasi? Tim pengembang SPEAKOFFICE siap menyambut pesanmu!
+        </p>
+        
+        <!-- TOMBOL EMAIL INTERAKTIF -->
+        <div class="contact-action-wrap">
+          <a href="mailto:speakoffice26@gmail.com" class="contact-email-btn" title="Kirim email ke SPEAKOFFICE">
+            <span class="email-icon">📬</span>
+            <span class="email-text">speakoffice26@gmail.com</span>
+            <span class="email-arrow">→</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER (DIPERTAHANKAN) -->
+  <footer class="footer">
+    <div class="container">
+      <p>SpeakOffice &copy; 2026 - Speak Professionally, Serve Excellently</p>
+    </div>
+  </footer>
+
+  <!-- MOBILE BOTTOM NAVIGATION (DIPERTAHANKAN) -->
+  <nav class="bottom-nav">
+    <a href="../index.html" class="bottom-nav-item"><span>🏠</span><span>Beranda</span></a>
+    <a href="case-study.html" class="bottom-nav-item"><span>💬</span><span>Case Study</span></a>
+    <a href="phrasebook.html" class="bottom-nav-item"><span>📖</span><span>Phrasebook</span></a>
+    <a href="etiquette.html" class="bottom-nav-item"><span>👁️</span><span>Visual</span></a>
+    <a href="about.html" class="bottom-nav-item active"><span>ℹ️</span><span>About</span></a>
+  </nav>
+
+</body>
+</html>

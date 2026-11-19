@@ -427,3 +427,464 @@ img {
     font-size: 2rem;
   }
 }
+/* ========================================================
+   ANIMASI & MIKRO-INTERAKSI SPEAKOFFICE (CATCHY & HIDUP)
+   ======================================================== */
+
+/* 1. EFEK TOMBOL "MULAI BELAJAR" (Dipencet Membal + Hover Glow) */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+  cursor: pointer;
+}
+
+/* Saat mouse di atas tombol */
+.btn-primary:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.45);
+}
+
+/* SAAT DIPENCET / DIKLIK (Efek Membal Pegas) */
+.btn-primary:active {
+  transform: translateY(1px) scale(0.96);
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+/* Panah meluncur ke kanan saat tombol disentuh */
+.btn-primary span {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+.btn-primary:hover span {
+  transform: translateX(5px);
+}
+
+
+/* 2. EFEK 3 KARTU FITUR DI BAWAH (Interactive Case Study, dll) */
+.feature-card {
+  transition: transform 0.25s cubic-bezier(0.2, 0, 0.2, 1), 
+              box-shadow 0.25s ease, 
+              border-color 0.25s ease;
+  cursor: pointer;
+}
+
+/* Saat mouse di atas kartu: kartu naik dan bayangannya menyebar */
+.feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 32px rgba(37, 99, 235, 0.12);
+  border-color: #3b82f6 !important;
+}
+
+/* Ikon membal & miring saat kartu di-hover */
+.feature-card:hover .feature-icon {
+  transform: scale(1.15) rotate(8deg);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Panah di dalam kartu meluncur */
+.feature-card:hover .feature-arrow {
+  transform: translateX(4px);
+  color: #2563eb;
+  transition: all 0.2s ease;
+}
+
+
+/* 3. OBJEK MENGAMBANG (FLOATING BADGES DI HERO) */
+@keyframes floatUpAndDown {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes floatReverse {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(7px);
+  }
+}
+
+.floating-badge {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  padding: 8px 14px;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E0EDFF;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.floating-badge-1 {
+  top: -12px;
+  left: -12px;
+  animation: floatUpAndDown 4s ease-in-out infinite;
+}
+
+.floating-badge-2 {
+  bottom: 24px;
+  right: -10px;
+  animation: floatReverse 4.5s ease-in-out infinite;
+}
+
+.floating-badge-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: bold;
+}
+/* ========================================================
+   INTERAKSI NAVBAR (LOGO, LINKS, PROFILE POPUP)
+   ======================================================== */
+
+/* 1. EFEK JELLY BOUNCE SAAT LOGO DIKLIK */
+@keyframes jellyBounce {
+  0% { transform: scale(1, 1); }
+  30% { transform: scale(1.2, 0.85); }
+  40% { transform: scale(0.85, 1.15); }
+  60% { transform: scale(1.05, 0.95); }
+  100% { transform: scale(1, 1); }
+}
+.brand-logo:hover img {
+  transform: scale(1.05) rotate(4deg);
+  transition: transform 0.2s ease;
+}
+.jelly-active {
+  animation: jellyBounce 0.5s ease;
+}
+
+/* 2. EFEK GARIS BAWAH MELEBAR PADA MENU NAVIGASI */
+.nav-link {
+  position: relative;
+  text-decoration: none;
+  transition: color 0.2s ease, transform 0.15s ease;
+  padding: 6px 0;
+}
+.nav-link:hover {
+  color: #2563eb !important;
+  transform: translateY(-1px);
+}
+.nav-link:active {
+  transform: scale(0.95);
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  width: 0;
+  height: 3px;
+  background: #2563eb;
+  border-radius: 99px;
+  transition: width 0.25s ease, left 0.25s ease;
+}
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+  left: 0;
+}
+
+/* 3. TOMBOL IKON (🔍 dan 👤) MEMBAL EMPUK SAAT DIKLIK */
+.icon-btn {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+  user-select: none;
+}
+.icon-btn:hover {
+  transform: translateY(-2px) scale(1.08);
+  background: #DBEAFE !important;
+}
+.icon-btn:active {
+  transform: scale(0.88);
+}
+
+/* 4. KARTU POP-UP PROFIL MAHASISWA */
+.profile-card-popup {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  width: 260px;
+  background: #FFFFFF;
+  border-radius: 16px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+  border: 1px solid #E2E8F0;
+  padding: 16px;
+  z-index: 9999;
+  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+/* ========================================================
+   STYLING KHUSUS HALAMAN ABOUT US (INTERAKTIF & MODERN)
+   ======================================================== */
+
+/* 1. Header & Badge Animasi */
+.about-hero-header {
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.about-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-soft-blue, #EFF6FF);
+  color: var(--color-royal, #1642B9);
+  padding: 6px 18px;
+  border-radius: 99px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: 1px solid #DBEAFE;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.06);
+}
+
+.about-badge-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-cobalt, #2563EB);
+  border-radius: 50%;
+  animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.5; }
+}
+
+.about-main-title {
+  font-size: 2.1rem;
+  color: var(--color-navy, #0A1E5E);
+  margin-top: 14px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.about-lead-desc {
+  color: var(--text-secondary, #64748B);
+  margin-top: 14px;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 740px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 2. Grid Visi & Misi Responsif */
+.vision-mission-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+
+@media (max-width: 768px) {
+  .vision-mission-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* 3. Card Visi & Misi Modern dengan Efek Gerak (Hover Lift & Glow) */
+.about-feature-card {
+  background: #FFFFFF;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 20px;
+  padding: 30px 26px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-col;
+  flex-direction: column;
+  transition: transform 0.28s cubic-bezier(0.2, 0, 0.2, 1), 
+              box-shadow 0.28s cubic-bezier(0.2, 0, 0.2, 1), 
+              border-color 0.28s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-feature-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 18px 36px -6px rgba(37, 99, 235, 0.12);
+  border-color: #3B82F6;
+}
+
+/* Ikon atas membal saat card disentuh */
+.card-top-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  background: var(--bg-soft-blue, #EFF6FF);
+  color: var(--color-cobalt, #2563EB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 18px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: inset 0 2px 6px rgba(37, 99, 235, 0.08);
+}
+
+.about-feature-card:hover .card-top-icon {
+  transform: scale(1.15) rotate(6deg);
+  background: #DBEAFE;
+}
+
+.card-title {
+  color: var(--color-navy, #0A1E5E);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.card-paragraph {
+  color: var(--text-secondary, #64748B);
+  line-height: 1.65;
+  font-size: 0.95rem;
+}
+
+.card-highlight-pill {
+  margin-top: auto;
+  padding-top: 18px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-royal, #1642B9);
+}
+
+/* Checklist Misi */
+.mission-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mission-checklist li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text-secondary, #64748B);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.check-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #DCFCE7;
+  color: #16A34A;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* 4. Section Hubungi Kami */
+.contact-section-card {
+  background: linear-gradient(135deg, #FFFFFF 0%, #F0F6FF 100%);
+  border: 1.5px solid #DBEAFE;
+  border-radius: 22px;
+  padding: 38px 24px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.06);
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.contact-section-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px rgba(37, 99, 235, 0.1);
+}
+
+.contact-icon-bubble {
+  width: 58px;
+  height: 58px;
+  background: #FFFFFF;
+  border: 1.5px solid #BFDBFE;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.7rem;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.12);
+  animation: floatBubble 4s ease-in-out infinite;
+}
+
+@keyframes floatBubble {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.contact-title {
+  color: var(--color-navy, #0A1E5E);
+  font-size: 1.45rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.contact-subtitle {
+  color: var(--text-secondary, #64748B);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 580px;
+  margin: 0 auto 24px auto;
+}
+
+/* Tombol Email Interaktif */
+.contact-email-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-cobalt, #2563EB);
+  color: #FFFFFF !important;
+  text-decoration: none;
+  padding: 13px 28px;
+  border-radius: 99px;
+  font-weight: 600;
+  font-size: 0.98rem;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.35);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+
+.contact-email-btn:hover {
+  background: #1D4ED8;
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.45);
+}
+
+.contact-email-btn:active {
+  transform: translateY(1px) scale(0.96);
+}
+
+.email-arrow {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.contact-email-btn:hover .email-arrow {
+  transform: translateX(4px);
+}

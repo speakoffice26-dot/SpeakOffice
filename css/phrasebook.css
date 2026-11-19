@@ -1,0 +1,209 @@
+/* ==========================================================================
+   OFFICE PHRASEBOOK & BILINGUAL GLOSSARY STYLING (css/phrasebook.css)
+   ========================================================================== */
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-light, #F8FAFC);
+}
+
+.phrasebook-container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 0 20px;
+  flex: 1;
+  width: 100%;
+}
+
+/* Learning Journey Card */
+.learning-journey-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.08);
+  border: 1.5px solid rgba(37, 99, 235, 0.2);
+  margin-bottom: 32px;
+}
+
+.journey-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.journey-step-item {
+  background: #F8FAFC;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.journey-step-item:hover {
+  border-color: #2563EB;
+  transform: translateY(-2px);
+}
+
+.start-here-box {
+  background: #EFF6FF;
+  border-color: #2563EB;
+}
+
+.step-badge-top {
+  position: absolute;
+  top: -10px;
+  right: 16px;
+  background: #2563EB;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.step-number {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #2563EB;
+}
+
+.step-link-btn {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2563EB;
+  text-decoration: none;
+}
+
+.step-link-btn:hover {
+  text-decoration: underline;
+}
+
+/* Navigasi Huruf Alfabet A-Z */
+.alphabet-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  background: #FFFFFF;
+  padding: 14px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border: 1px solid #E2E8F0;
+  margin-bottom: 24px;
+}
+
+.alphabet-btn {
+  width: 32px;
+  height: 32px;
+  background: #F1F5F9;
+  color: #1E293B;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.alphabet-btn:hover {
+  background: #2563EB;
+  color: white;
+}
+
+/* Search Bar Wrapper */
+.search-bar-wrapper {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1.5px solid rgba(37, 99, 235, 0.15);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 10;
+}
+
+.search-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+  color: #1E293B;
+  background: transparent;
+  cursor: text;
+}
+
+/* Grid Layout */
+.phrase-grid, .phrases-list-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.phrase-card {
+  background: #FFFFFF;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #E2E8F0;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.phrase-card:hover {
+  transform: translateY(-3px);
+  border-color: #2563EB;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.category-tag {
+  display: inline-block;
+  background: #EFF6FF;
+  color: #1D4ED8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  margin-bottom: 12px;
+}
+
+.lang-block {
+  margin-bottom: 8px;
+}
+
+.lang-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: #64748B;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.lang-text {
+  font-size: 0.95rem;
+  color: #1E293B;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.no-result {
+  text-align: center;
+  grid-column: 1 / -1;
+  padding: 60px 20px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #E2E8F0;
+}

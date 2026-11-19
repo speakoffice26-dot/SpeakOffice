@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Guru & Rekap Aktivitas Siswa - SPEAKOFFICE</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <style>
+    /* STYLING KHUSUS TEACHER DASHBOARD */
+    :root {
+      --teacher-primary: #1E3A8A;
+      --teacher-accent: #2563EB;
+      --teacher-light: #EFF6FF;
+      --success-green: #059669;
+      --warning-amber: #D97706;
+      --danger-red: #DC2626;
+    }
+
+    body {
+      background-color: #F8FAFC;
+    }
+
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 32px auto 60px auto;
+      padding: 0 24px;
+    }
+
+    .teacher-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #EFF6FF;
+      color: #1D4ED8;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 99px;
+      border: 1px solid #BFDBFE;
+      margin-bottom: 12px;
+    }
+
+    /* Metric Cards Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .metric-card {
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.08);
+      border-color: #93C5FD;
+    }
+    .metric-icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+    }
+    .metric-number {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #0F172A;
+      line-height: 1.2;
+    }
+    .metric-label {
+      font-size: 0.85rem;
+      color: #64748B;
+      font-weight: 600;
+    }
+
+    /* Controls & Toolbar */
+    .toolbar-card {
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      margin-bottom: 24px;
+    }
+    .filter-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      flex: 1;
+    }
+    .select-input, .search-box-input {
+      padding: 10px 14px;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      color: #1E293B;
+      background: #FFFFFF;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .select-input:focus, .search-box-input:focus {
+      border-color: #2563EB;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+    .search-box-input {
+      min-width: 240px;
+      flex: 1;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-export {
+      background: #059669;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+    }
+    .btn-export:hover {
+      background: #047857;
+      transform: translateY(-2px);
+    }
+    .btn-refresh {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+    }
+    .btn-refresh:hover {
+      background: #DBEAFE;
+    }
+    .btn-reset {
+      background: #FEF2F2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+    }
+    .btn-reset:hover {
+      background: #FEE2E2;
+    }
+
+    /* Table Rekap Aktivitas */
+    .table-container {
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 18px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+      overflow-x: auto;
+    }
+    .rekap-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    .rekap-table th {
+      background: #F8FAFC;
+      color: #475569;
+      font-weight: 700;
+      padding: 14px 18px;
+      border-bottom: 2px solid #E2E8F0;
+      white-space: nowrap;
+    }
+    .rekap-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid #F1F5F9;
+      color: #1E293B;
+      vertical-align: middle;
+    }
+    .rekap-table tr:hover td {
+      background-color: #F8FAFC;
+    }
+
+    /* Predikat Badge */
+    .predicate-badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 0.8rem;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .badge-excellent {
+      background: #DCFCE7;
+      color: #15803D;
+      border: 1px solid #86EFAC;
+    }
+    .badge-competent {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #93C5FD;
+    }
+    .badge-practice {
+      background: #FEF3C7;
+      color: #B45309;
+      border: 1px solid #FCD34D;
+    }
+
+    /* PIN GATEWAY OVERLAY & ANIMASI AUTENTIKASI ELEGAN */
+    #pinOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    @keyframes pinCardPopIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.88) translateY(24px);
+      }
+      65% {
+        opacity: 1;
+        transform: scale(1.02) translateY(-4px);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    @keyframes avatarTeacherFloat {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 8px 24px rgba(37, 99, 235, 0.18);
+      }
+      50% {
+        transform: translateY(-6px) scale(1.04);
+        box-shadow: 0 16px 32px rgba(37, 99, 235, 0.28);
+      }
+    }
+
+    @keyframes shakeErrorAnim {
+      0%, 100% { transform: translateX(0); }
+      15%, 45%, 75% { transform: translateX(-8px); }
+      30%, 60%, 90% { transform: translateX(8px); }
+    }
+
+    .shake-error {
+      animation: shakeErrorAnim 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+    }
+
+    .pin-auth-card {
+      background: #FFFFFF;
+      border-radius: 24px;
+      max-width: 440px;
+      width: 100%;
+      padding: 40px 32px 32px 32px;
+      text-align: center;
+      box-shadow: 0 25px 60px -10px rgba(15, 23, 42, 0.35), 0 0 0 1px rgba(226, 232, 240, 0.8);
+      animation: pinCardPopIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      position: relative;
+    }
+
+    .pin-avatar-circle {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      color: #2563EB;
+      font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px auto;
+      border: 3.5px solid #FFFFFF;
+      animation: avatarTeacherFloat 3.5s ease-in-out infinite;
+      cursor: default;
+    }
+
+    .pin-input-field {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px 18px;
+      border: 2px solid #E2E8F0;
+      border-radius: 14px;
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-align: center;
+      color: #0F172A;
+      background: #F8FAFC;
+      outline: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .pin-input-field:focus {
+      background: #FFFFFF;
+      border-color: #2563EB;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+      transform: translateY(-1px);
+    }
+
+    /* TOMBOL KEMBALI & BUKA DASHBOARD YANG SELARAS & PROPORSIONAL */
+    .btn-auth-back {
+      flex: 1;
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #475569;
+      background: #F1F5F9;
+      border: 1.5px solid #CBD5E1;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+    }
+    .btn-auth-back:hover {
+      background: #E2E8F0;
+      color: #1E293B;
+      border-color: #94A3B8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .btn-auth-back:active {
+      transform: scale(0.97);
+    }
+
+    .btn-auth-submit {
+      flex: 1.45;
+      height: 48px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 0 20px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+      transition: all 0.22s ease;
+      box-sizing: border-box;
+    }
+    .btn-auth-submit:hover {
+      background: linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.45);
+    }
+    .btn-auth-submit:active {
+      transform: scale(0.97);
+    }
+
+    /* In-app Toast */
+    .toast-box {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 100000;
+      background: #FFFFFF;
+      border-radius: 14px;
+      padding: 14px 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      border: 1px solid #E2E8F0;
+      border-left: 5px solid #2563EB;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes slideInToast {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOAST NOTIFIKASI ELEGAN -->
+  <div id="toastNotification" class="toast-box">
+    <div id="toastIcon" style="font-size: 1.3rem;">ℹ️</div>
+    <div>
+      <div id="toastTitle" style="font-weight: 700; color: #1E293B; font-size: 0.9rem;">Pemberitahuan</div>
+      <div id="toastDesc" style="color: #64748B; font-size: 0.8rem;">Aksi berhasil dijalankan.</div>
+    </div>
+  </div>
+
+  <!-- PIN ACCESS GATEWAY (MODAL PENGAMAN GURU - RAHASIA & BERANIMASI) -->
+  <div id="pinOverlay">
+    <div class="pin-auth-card" id="pinCardBox">
+      
+      <!-- Avatar Guru Animatif (Melayang Lembut) -->
+      <div class="pin-avatar-circle" title="Mode Guru Terverifikasi">
+        👨‍🏫
+      </div>
+      
+      <h3 style="font-size: 1.45rem; color: #0A1E5E; margin: 0 0 6px 0; font-weight: 800;">
+        Autentikasi Mode Guru
+      </h3>
+      <p style="font-size: 0.88rem; color: #64748B; margin: 0 0 22px 0; line-height: 1.55;">
+        Halaman ini khusus untuk Pengajar/Guru SMK guna memantau perkembangan kompetensi & rekap nilai siswa.
+      </p>
+
+      <div style="margin-bottom: 18px; text-align: left;">
+        <label for="inputPin" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 8px;">
+          Masukkan PIN Keamanan Guru:
+        </label>
+        <input type="password" id="inputPin" class="pin-input-field" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyTeacherPin()">
+      </div>
+
+      <!-- Pesan Error Animatif -->
+      <div id="pinErrorMsg" style="display: none; background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; margin-bottom: 18px;">
+        ⚠️ PIN Salah! Akses ditolak. Silakan coba lagi.
+      </div>
+
+      <!-- Tombol Kembali & Buka Dashboard yang Selaras & Proporsional -->
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <a href="../index.html" class="btn-auth-back" title="Kembali ke Beranda" onclick="if(history.length > 1) { history.back(); return false; }">
+          <span>←</span> Kembali
+        </a>
+        <button id="btnSubmitPin" onclick="verifyTeacherPin()" class="btn-auth-submit">
+          <span>Buka Dashboard</span> <span>🚀</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="../index.html" class="brand-logo" id="logoBtn">
+        <img src="../assets/logobesar.png" alt="Logo SPEAKOFFICE" style="height: 48px; width: auto;">
+      </a>
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Beranda</a>
+        <a href="case-study.html" class="nav-link">Interactive Case Study</a>
+        <a href="phrasebook.html" class="nav-link">Phrasebook</a>
+        <a href="etiquette.html" class="nav-link">Visual Etiquette</a>
+        <a href="profile.html" class="nav-link">Profil Siswa</a>
+      </nav>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px;">
+        <button onclick="exitTeacherMode()" class="btn-action btn-reset" style="padding: 6px 14px; font-size: 0.8rem; border-radius: 8px;">
+          🚪 Keluar Mode Guru
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- KONTEN UTAMA DASHBOARD GURU -->
+  <main class="dashboard-container">
+    
+    <!-- HEADER HERO -->
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; margin-bottom: 28px; gap: 16px;">
+      <div>
+        <div class="teacher-badge">
+          <span>👨‍🏫</span> Mode Pengajar & Evaluator SMK
+          <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #10B981; margin-left: 6px;"></span>
+          <span style="color: #059669; font-size: 0.75rem;">Live Ready</span>
+        </div>
+        <h2 style="font-size: 2rem; color: #0F172A; margin: 0 0 6px 0;">Dashboard Rekapitulasi Pembelajaran Siswa</h2>
+        <p style="color: #64748B; font-size: 0.95rem; margin: 0;">
+          Pantau hasil evaluasi <em>Interactive Case Study</em>, kompetensi komunikasi, dan riwayat pengerjaan siswa secara real-time.
+        </p>
+      </div>
+
+      <!-- Quick Export Button Top -->
+      <div>
+        <button onclick="exportDataCSV()" class="btn-action btn-export">
+          <span>📥</span> Ekspor Rekap Nilai ke CSV / Excel
+        </button>
+      </div>
+    </div>
+
+    <!-- METRICS OVERVIEW CARDS -->
+    <section class="metrics-grid">
+      <!-- Total Submissions -->
+      <div class="metric-card">
+        <div class="metric-icon-box" style="background: #EFF6FF; color: #2563EB;">📝</div>
+        <div>
+          <div id="statTotalSubmissions" class="metric-number">0</div>
+          <div class="metric-label">Total Aktivitas Selesai</div>
+        </div>
+      </div>
+
+      <!-- Average Score -->
+      <div class="metric-card">
+        <div class="metric-icon-box" style="background: #ECFDF5; color: #059669;">🎯</div>
+        <div>
+          <div id="statAverageScore" class="metric-number">0/100</div>
+          <div class="metric-label">Rata-rata Skor Siswa</div>
+        </div>
+      </div>
+
+      <!-- Sangat Kompeten Count -->
+      <div class="metric-card">
+        <div class="metric-icon-box" style="background: #F0FDF4; color: #16A34A;">🏆</div>
+        <div>
+          <div id="statExcellentCount" class="metric-number">0</div>
+          <div class="metric-label">Predikat 'Sangat Kompeten'</div>
+        </div>
+      </div>
+
+      <!-- Passing Rate -->
+      <div class="metric-card">
+        <div class="metric-icon-box" style="background: #FEF3C7; color: #D97706;">📈</div>
+        <div>
+          <div id="statPassingRate" class="metric-number">0%</div>
+          <div class="metric-label">Tingkat Ketuntasan (&ge;75)</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOLBAR & FILTER CONTROLS -->
+    <section class="toolbar-card">
+      <div class="filter-row">
+        <div class="filter-group">
+          <!-- Filter Kelas -->
+          <div>
+            <label for="filterClass" style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 4px;">Kelas / Jurusan:</label>
+            <select id="filterClass" class="select-input" onchange="applyFilters()">
+              <option value="all">Semua Kelas</option>
+              <option value="X MP 1">X MP 1</option>
+              <option value="X MP 2">X MP 2</option>
+              <option value="XI MP 1">XI MP 1</option>
+              <option value="XI MP 2">XI MP 2</option>
+              <option value="XII MP 1">XII MP 1</option>
+              <option value="XII MP 2">XII MP 2</option>
+            </select>
+          </div>
+
+          <!-- Filter Kategori Skenario -->
+          <div>
+            <label for="filterCategory" style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 4px;">Kategori Skenario:</label>
+            <select id="filterCategory" class="select-input" onchange="applyFilters()">
+              <option value="all">Semua Kategori</option>
+              <option value="Menerima Tamu & Janji Temu">Menerima Tamu & Janji Temu</option>
+              <option value="Etika Telepon & Korespondensi Bisnis">Etika Telepon & Korespondensi</option>
+              <option value="Pelayanan Prima & Penanganan Keluhan">Pelayanan Prima & Keluhan</option>
+              <option value="Semua Kategori (Uji Komprehensif)">Uji Komprehensif (15 Kasus)</option>
+            </select>
+          </div>
+
+          <!-- Search Input -->
+          <div style="flex: 1;">
+            <label for="searchInput" style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748B; margin-bottom: 4px;">Cari Siswa:</label>
+            <input type="text" id="searchInput" class="search-box-input" placeholder="🔍 Cari nama atau no. absen..." onkeyup="applyFilters()">
+          </div>
+        </div>
+
+        <!-- Utility Buttons -->
+        <div style="display: flex; gap: 8px; align-items: flex-end;">
+          <button onclick="refreshData()" class="btn-action btn-refresh" title="Muat Ulang Data">
+            🔄 Refresh
+          </button>
+          <button onclick="confirmResetData()" class="btn-action btn-reset" title="Hapus Data Riwayat">
+            🗑️ Reset
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- REKAPITULASI TABEL SISWA -->
+    <section class="table-container">
+      <table class="rekap-table">
+        <thead>
+          <tr>
+            <th style="width: 50px; text-align: center;">No</th>
+            <th>Waktu Pengerjaan</th>
+            <th>Nama Siswa</th>
+            <th>Kelas / Jurusan</th>
+            <th style="text-align: center;">No. Absen</th>
+            <th>Kategori Skenario</th>
+            <th style="text-align: center;">Skor Angka</th>
+            <th style="text-align: center;">Predikat</th>
+          </tr>
+        </thead>
+        <tbody id="studentTableBody">
+          <!-- Diisi otomatis oleh JavaScript -->
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div id="emptyTableState" style="display: none; text-align: center; padding: 48px 24px;">
+        <div style="font-size: 3rem; margin-bottom: 12px;">📭</div>
+        <h4 style="color: #1E293B; margin-bottom: 6px;">Belum Ada Data Siswa</h4>
+        <p style="color: #64748B; font-size: 0.9rem; max-width: 500px; margin: 0 auto 16px auto;">
+          Siswa yang menyelesaikan studi kasus di SPEAKOFFICE akan langsung otomatis muncul di tabel ini secara real-time.
+        </p>
+        <button onclick="loadDemoDataFromDashboard()" class="btn-action btn-refresh" style="font-size: 0.85rem; padding: 8px 16px;">
+          📝 Muat Contoh Data Simulasi Demo
+        </button>
+      </div>
+    </section>
+
+    <!-- KARTU PANDUAN INTEGRASI FIREBASE FIRESTORE -->
+    <section style="margin-top: 36px; background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 18px; padding: 24px; color: #334155;">
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+        <div style="width: 36px; height: 36px; border-radius: 8px; background: #FFF7ED; color: #EA580C; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+          🔥
+        </div>
+        <h3 style="font-size: 1.15rem; color: #0F172A; margin: 0;">Status Sinkronisasi Cloud: Firebase Ready</h3>
+      </div>
+      <p style="font-size: 0.9rem; line-height: 1.6; margin-bottom: 14px;">
+        Sistem SPEAKOFFICE saat ini berjalan secara mulus menggunakan <strong>LocalStorage Cache</strong> dan siap langsung disinkronkan ke <strong>Google Firebase Firestore</strong>.
+      </p>
+      <div style="background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; font-size: 0.85rem; font-family: monospace; color: #475569;">
+        📁 File Konfigurasi: <strong>js/firebase-config.js</strong> &rarr; Masukkan API Key & Project ID Firebase Console Anda untuk penyimpanan multi-perangkat real-time antar ruang kelas lab komputer.
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p>SpeakOffice &copy; 2026 - Media Pembelajaran Komunikasi & Etika Perkantoran (Mode Guru)</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT DATABASE & LOGIKA DASHBOARD GURU -->
+  <script src="../js/firebase-config.js"></script>
+  <script>
+    const VALID_PINS = ["12GURU34", "123456"];
+    let currentLogs = [];
+
+    // FUNGSI CEK AUTENTIKASI PIN
+    function checkTeacherAuth() {
+      const isAuth = sessionStorage.getItem('speakoffice_teacher_auth');
+      const pinOverlay = document.getElementById('pinOverlay');
+      if (isAuth === 'true') {
+        pinOverlay.style.display = 'none';
+        loadDashboardData();
+      } else {
+        pinOverlay.style.display = 'flex';
+        setTimeout(() => document.getElementById('inputPin').focus(), 100);
+      }
+    }
+
+    function verifyTeacherPin() {
+      const input = document.getElementById('inputPin');
+      const pin = input.value.trim();
+      const err = document.getElementById('pinErrorMsg');
+      const card = document.getElementById('pinCardBox');
+      const btn = document.getElementById('btnSubmitPin');
+      
+      if (VALID_PINS.includes(pin)) {
+        err.style.display = 'none';
+        btn.innerHTML = `<span>Terverifikasi!</span> <span>✓</span>`;
+        btn.style.background = 'linear-gradient(135deg, #10B981 0%, #059669 100%)';
+        btn.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
+        
+        sessionStorage.setItem('speakoffice_teacher_auth', 'true');
+        setTimeout(() => {
+          const overlay = document.getElementById('pinOverlay');
+          overlay.style.opacity = '0';
+          setTimeout(() => {
+            overlay.style.display = 'none';
+            overlay.style.opacity = '1';
+            showToast("Selamat Datang, Guru!", "Dashboard pengajar siap digunakan.", "👨‍🏫");
+            loadDashboardData();
+          }, 280);
+        }, 350);
+      } else {
+        err.style.display = 'block';
+        if (card) {
+          card.classList.remove('shake-error');
+          void card.offsetWidth; // Trigger reflow
+          card.classList.add('shake-error');
+        }
+        input.select();
+      }
+    }
+
+    function exitTeacherMode() {
+      sessionStorage.removeItem('speakoffice_teacher_auth');
+      window.location.href = "../index.html";
+    }
+
+    // FUNGSI NOTIFIKASI TOAST DALAM WEBSITE
+    function showToast(title, desc, icon = "ℹ️") {
+      const toast = document.getElementById('toastNotification');
+      document.getElementById('toastTitle').innerText = title;
+      document.getElementById('toastDesc').innerText = desc;
+      document.getElementById('toastIcon').innerText = icon;
+      toast.style.display = 'flex';
+
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3500);
+    }
+
+    // MEMUAT DATA DARI SPEAKOFFICE DB
+    function loadDashboardData() {
+      currentLogs = window.SpeakOfficeDB.getStudentActivitiesSync();
+      applyFilters();
+    }
+
+    // FILTER & SEARCH REAL-TIME
+    function applyFilters() {
+      const classVal = document.getElementById('filterClass').value;
+      const catVal = document.getElementById('filterCategory').value;
+      const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      let filtered = currentLogs.filter(item => {
+        // Filter Kelas
+        if (classVal !== 'all' && item.studentClass.toLowerCase() !== classVal.toLowerCase()) {
+          return false;
+        }
+        // Filter Kategori
+        if (catVal !== 'all' && item.category !== catVal) {
+          return false;
+        }
+        // Search Nama / Absen
+        if (searchVal) {
+          const matchName = (item.studentName || '').toLowerCase().includes(searchVal);
+          const matchAbsent = (item.studentAbsent || '').toString().toLowerCase().includes(searchVal);
+          if (!matchName && !matchAbsent) return false;
+        }
+        return true;
+      });
+
+      renderTable(filtered);
+      updateMetrics(filtered);
+    }
+
+    // RENDER TABEL REKAPITULASI
+    function renderTable(data) {
+      const tbody = document.getElementById('studentTableBody');
+      const emptyState = document.getElementById('emptyTableState');
+      tbody.innerHTML = '';
+
+      if (!data || data.length === 0) {
+        emptyState.style.display = 'block';
+        return;
+      }
+      emptyState.style.display = 'none';
+
+      data.forEach((item, index) => {
+        const tr = document.createElement('tr');
+
+        // Style predikat
+        let badgeClass = 'badge-competent';
+        if (item.score >= 85 || item.predicate === 'Sangat Kompeten') {
+          badgeClass = 'badge-excellent';
+        } else if (item.score < 75 || item.predicate === 'Perlu Latihan') {
+          badgeClass = 'badge-practice';
+        }
+
+        tr.innerHTML = `
+          <td style="text-align: center; color: #94A3B8; font-weight: 600;">${index + 1}</td>
+          <td style="white-space: nowrap; font-size: 0.85rem; color: #64748B;">📅 ${item.timestamp || '-'}</td>
+          <td>
+            <div style="font-weight: 700; color: #0F172A;">${item.studentName || 'Siswa'}</div>
+          </td>
+          <td><span style="background: #F1F5F9; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 0.8rem;">${item.studentClass || '-'}</span></td>
+          <td style="text-align: center; font-weight: 700;">${item.studentAbsent || '-'}</td>
+          <td style="font-size: 0.85rem; color: #334155; font-weight: 500;">${item.category || 'Interactive Case Study'}</td>
+          <td style="text-align: center;">
+            <span style="font-size: 1.1rem; font-weight: 800; color: ${item.score >= 85 ? '#15803D' : item.score >= 75 ? '#2563EB' : '#D97706'};">
+              ${item.score}
+            </span>
+            <span style="color: #94A3B8; font-size: 0.8rem;">/100</span>
+          </td>
+          <td style="text-align: center;">
+            <span class="predicate-badge ${badgeClass}">${item.predicate || 'Kompeten'}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // UPDATE STATISTIK / METRICS
+    function updateMetrics(data) {
+      const total = data.length;
+      document.getElementById('statTotalSubmissions').innerText = total;
+
+      if (total === 0) {
+        document.getElementById('statAverageScore').innerText = '0/100';
+        document.getElementById('statExcellentCount').innerText = '0';
+        document.getElementById('statPassingRate').innerText = '0%';
+        return;
+      }
+
+      const totalScore = data.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
+      const avg = Math.round(totalScore / total);
+      document.getElementById('statAverageScore').innerText = `${avg}/100`;
+
+      const excellent = data.filter(item => (Number(item.score) >= 85) || item.predicate === 'Sangat Kompeten').length;
+      document.getElementById('statExcellentCount').innerText = excellent;
+
+      const passed = data.filter(item => Number(item.score) >= 75).length;
+      const passRate = Math.round((passed / total) * 100);
+      document.getElementById('statPassingRate').innerText = `${passRate}%`;
+    }
+
+    // EKSPOR KE CSV / EXCEL
+    function exportDataCSV() {
+      const classVal = document.getElementById('filterClass').value;
+      const catVal = document.getElementById('filterCategory').value;
+      const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+      const currentFiltered = currentLogs.filter(item => {
+        if (classVal !== 'all' && item.studentClass.toLowerCase() !== classVal.toLowerCase()) return false;
+        if (catVal !== 'all' && item.category !== catVal) return false;
+        if (searchVal) {
+          const matchName = (item.studentName || '').toLowerCase().includes(searchVal);
+          const matchAbsent = (item.studentAbsent || '').toString().toLowerCase().includes(searchVal);
+          if (!matchName && !matchAbsent) return false;
+        }
+        return true;
+      });
+
+      const success = window.SpeakOfficeDB.exportToCSV(currentFiltered);
+      if (success) {
+        showToast("Ekspor Berhasil", "File Rekap_Nilai_SPEAKOFFICE.csv berhasil diunduh.", "📥");
+      } else {
+        showToast("Data Kosong", "Tidak ada data siswa untuk diekspor saat ini.", "⚠️");
+      }
+    }
+
+    // REFRESH DATA
+    function refreshData() {
+      loadDashboardData();
+      showToast("Data Diperbarui", "Tabel aktivitas siswa telah diperbarui.", "🔄");
+    }
+
+    // RESET DATA
+    function confirmResetData() {
+      const isConfirm = window.confirm("Apakah Anda yakin ingin mereset seluruh data riwayat siswa di SpeakOffice?");
+      if (isConfirm) {
+        window.SpeakOfficeDB.resetActivities();
+        loadDashboardData();
+        showToast("Data Direset", "Seluruh data riwayat aktivitas telah dibersihkan.", "🗑️");
+      }
+    }
+
+    // MUAT DATA DEMO
+    function loadDemoDataFromDashboard() {
+      window.SpeakOfficeDB.loadDemoData();
+      loadDashboardData();
+      showToast("Data Demo Dimuat", "5 data simulasi siswa berhasil dimasukkan ke tabel.", "📝");
+    }
+
+    // Inisialisasi saat halaman dibuka
+    window.onload = checkTeacherAuth;
+  </script>
+</body>
+</html>

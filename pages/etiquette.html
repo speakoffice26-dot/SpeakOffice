@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual Etiquette Guide - SPEAKOFFICE</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/etiquette.css">
+</head>
+<body>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="../index.html" class="brand-logo" id="logoBtn">
+        <img src="../assets/logobesar.png" alt="Logo SPEAKOFFICE" style="height: 48px; width: auto;">
+      </a>
+      
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Beranda</a>
+        <a href="case-study.html" class="nav-link">Interactive Case Study</a>
+        <a href="phrasebook.html" class="nav-link">Phrasebook</a>
+        <a href="etiquette.html" class="nav-link active">Visual Etiquette</a>
+        <a href="about.html" class="nav-link">About Us</a>
+      </nav>
+
+      <!-- AKSI KANAN: TOMBOL PROFIL MAHASISWA LENGKAP -->
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px; position: relative;">
+        <a href="teacher-dashboard.html" class="icon-btn" title="Mode Guru (Dashboard Pengajar)" style="text-decoration: none; font-size: 1.25rem; background: #FEF3C7; border: 1.5px solid #FCD34D; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%;">
+          👨‍🏫
+        </a>
+        <a href="phrasebook.html#searchInput" class="icon-btn" title="Cari Frasa Kantor" style="text-decoration: none; font-size: 1.2rem; background: var(--bg-soft-blue, #EFF6FF); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">🔍</a>
+        <a href="profile.html" class="icon-btn" title="Buka Profil Mahasiswa" style="text-decoration: none; font-size: 1.2rem; background: var(--bg-soft-blue, #EFF6FF); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; position: relative;">
+          👤
+          <span style="position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background: #22c55e; border: 2px solid #fff; border-radius: 50%;"></span>
+        </a>
+      </div></div>
+  </header>
+
+  <!-- KONTEN UTAMA ETIQUETTE HUB -->
+  <main class="etiquette-container">
+    <div style="margin-bottom: 32px;">
+      <span class="case-header-badge">Fitur 3: Panduan Estetika & Etika Perkantoran</span>
+      <h2 style="font-size: 2rem; color: var(--color-navy); margin-top: 4px;">Visual Etiquette Guide</h2>
+      <p style="color: var(--text-secondary);">Pilih modul etiket di bawah ini untuk mempelajari standar visual, tata busana, dan gestur profesional secara mendalam.</p>
+    </div>
+
+    <!-- GRID 3 KARTU UTAMA -->
+    <div class="etiquette-grid">
+      
+      <!-- Modul 1: Professional Attire -->
+      <div class="etiquette-card">
+        <div>
+          <div class="etiquette-icon-box">👔</div>
+          <h3 style="color: var(--color-navy); margin-bottom: 8px;">1. Professional Attire</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">Standar pakaian kerja formal, pemilihan warna, dan kerapian busana birokrasi.</p>
+        </div>
+        <div>
+          <a href="etiquette-attire.html" class="btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 10px; border-radius: 8px; font-size: 0.9rem;">
+            Pelajari Modul Ini &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Modul 2: Desk Etiquette -->
+      <div class="etiquette-card">
+        <div>
+          <div class="etiquette-icon-box">🖥️</div>
+          <h3 style="color: var(--color-navy); margin-bottom: 8px;">2. Desk Etiquette</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">Penerapan clean desk policy, keamanan dokumen, dan ergonomi meja kerja.</p>
+        </div>
+        <div>
+          <a href="etiquette-desk.html" class="btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 10px; border-radius: 8px; font-size: 0.9rem;">
+            Pelajari Modul Ini &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- Modul 3: Body Language & Gestures -->
+      <div class="etiquette-card">
+        <div>
+          <div class="etiquette-icon-box">🤝</div>
+          <h3 style="color: var(--color-navy); margin-bottom: 8px;">3. Body Language & Gestures</h3>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 16px;">Komunikasi non-verbal, kontak mata, dan etika menyambut tamu di front office.</p>
+        </div>
+        <div>
+          <a href="etiquette-gestures.html" class="btn-primary" style="display: block; text-align: center; text-decoration: none; padding: 10px; border-radius: 8px; font-size: 0.9rem;">
+            Pelajari Modul Ini &rarr;
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p><strong>SPEAKOFFICE</strong> &copy; 2026 - Speak Professionally, Serve Excellently</p>
+    </div>
+  </footer>
+
+  <script>
+    // Logika Klik Buka/Tutup Profil Pop-Up
+    const profileBtn = document.getElementById('profileBtn');
+    const profileCard = document.getElementById('profileCard');
+
+    if (profileBtn && profileCard) {
+      profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isClosed = profileCard.style.display === 'none' || profileCard.style.display === '';
+        profileCard.style.display = isClosed ? 'block' : 'none';
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!profileCard.contains(e.target) && !profileBtn.contains(e.target)) {
+          profileCard.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

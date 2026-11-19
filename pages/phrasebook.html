@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Office Phrasebook & Interactive Dialogues - SPEAKOFFICE</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/phrasebook.css">
+  <style>
+    /* STYLING TAMBAHAN INTERACTIVE OFFICE DIALOGUES */
+    .tab-nav-wrapper {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+      border-bottom: 2px solid #E2E8F0;
+      padding-bottom: 12px;
+    }
+    .main-tab-btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: 1.5px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .main-tab-btn:hover {
+      border-color: #2563EB;
+      background: #F8FAFC;
+    }
+    .main-tab-btn.active {
+      background: #2563EB;
+      color: #FFFFFF;
+      border-color: #2563EB;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    }
+
+    /* Kartu Dialog Percakapan 2 Arah */
+    .dialogue-card {
+      background: #FFFFFF;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+      margin-bottom: 32px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .dialogue-card:hover {
+      box-shadow: 0 12px 30px rgba(37, 99, 235, 0.08);
+      border-color: #93C5FD;
+    }
+
+    .dialogue-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 1px solid #BFDBFE;
+      margin-bottom: 10px;
+    }
+
+    /* Balon Percakapan Dua Arah */
+    .chat-flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .chat-bubble-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .chat-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    .avatar-receptionist {
+      background: #DBEAFE;
+      border: 1.5px solid #93C5FD;
+    }
+    .avatar-guest {
+      background: #FEF3C7;
+      border: 1.5px solid #FCD34D;
+    }
+
+    .bubble-content {
+      flex: 1;
+      background: #F8FAFC;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 16px;
+      padding: 16px 20px;
+      position: relative;
+    }
+    .chat-bubble-row.receptionist-row .bubble-content {
+      background: #F0F7FF;
+      border-color: #BFDBFE;
+    }
+    .speaker-name {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: #1E3A8A;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .text-indonesia {
+      font-size: 0.95rem;
+      color: #1E293B;
+      margin-bottom: 6px;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+    .text-english {
+      font-size: 0.9rem;
+      color: #2563EB;
+      font-style: italic;
+      font-weight: 600;
+      border-top: 1px dashed #CBD5E1;
+      padding-top: 6px;
+      line-height: 1.5;
+    }
+
+    /* Kotak Tips Etika & Sikap */
+    .etiquette-tips-box {
+      background: #ECFDF5;
+      border: 1.5px solid #A7F3D0;
+      border-radius: 14px;
+      padding: 18px 22px;
+      margin-top: 20px;
+    }
+    .tips-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #065F46;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tips-list {
+      margin: 0;
+      padding-left: 20px;
+      font-size: 0.85rem;
+      color: #047857;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="../index.html" class="brand-logo" id="logoBtn">
+        <img src="../assets/logobesar.png" alt="Logo SPEAKOFFICE" style="height: 48px; width: auto;">
+      </a>
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Beranda</a>
+        <a href="case-study.html" class="nav-link">Interactive Case Study</a>
+        <a href="phrasebook.html" class="nav-link active">Phrasebook</a>
+        <a href="etiquette.html" class="nav-link">Visual Etiquette</a>
+        <a href="about.html" class="nav-link">About Us</a>
+      </nav>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px; position: relative;">
+        <a href="teacher-dashboard.html" class="icon-btn" title="Mode Guru (Dashboard Pengajar)" style="text-decoration: none; font-size: 1.25rem; background: #FEF3C7; border: 1.5px solid #FCD34D; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%;">
+          👨‍🏫
+        </a>
+        <a href="profile.html" class="icon-btn" title="Buka Profil Siswa" style="text-decoration: none; font-size: 1.2rem; background: var(--bg-soft-blue, #EFF6FF); width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; position: relative;">
+          👤
+          <span style="position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background: #22c55e; border: 2px solid #fff; border-radius: 50%;"></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- KONTEN UTAMA PHRASEBOOK -->
+  <main class="phrasebook-container">
+    <div style="margin-bottom: 24px;">
+      <span class="case-header-badge">Fitur 2: Kamus Istilah, Frasa & Percakapan Kantor Bilingual</span>
+      <h2 style="font-size: 2rem; color: var(--color-navy); margin: 6px 0;">Office Phrasebook & Interactive Dialogues</h2>
+      <p style="color: var(--text-secondary); margin: 0;">
+        Pusat pembelajaran komprehensif kosakata administrasi, frasa bisnis bilingual, dan simulasi dialog dua arah berstandar profesional.
+      </p>
+    </div>
+
+    <!-- MAIN TAB SELECTOR (3 FITUR UTAMA) -->
+    <div class="tab-nav-wrapper">
+      <button class="main-tab-btn active" id="tabBtn1" onclick="switchMainTab('VOCAB')">
+        <span>📚</span> 1. Professional Vocabulary (A–Z)
+      </button>
+      <button class="main-tab-btn" id="tabBtn2" onclick="switchMainTab('PHRASES')">
+        <span>💬</span> 2. Frasa Bisnis & VIP Talks
+      </button>
+      <button class="main-tab-btn" id="tabBtn3" onclick="switchMainTab('DIALOGUES')">
+        <span>🎭</span> 3. Interactive Office Dialogues (Utuh 2 Arah)
+      </button>
+    </div>
+
+    <!-- FITUR SEARCH UTAMA (PENCARIAN REAL-TIME) -->
+    <div class="search-bar-wrapper">
+      <span style="font-size: 1.2rem;">🔍</span>
+      <input type="text" id="searchInput" class="search-input" placeholder="Cari istilah A-Z, frasa komunikasi, atau dialog percakapan kantor..." onkeyup="filterContent()">
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- BAGIAN 1: PROFESSIONAL VOCABULARY (A-Z) -->
+    <!-- =================================================================== -->
+    <section id="vocabSection">
+      <div class="section-title-wrapper" style="margin-bottom: 18px;">
+        <h3 style="color: var(--color-navy); font-size: 1.4rem; margin-bottom: 4px;">📚 Professional Vocabulary (A–Z)</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">56 istilah teknis administrasi perkantoran dan kesekretariatan.</p>
+      </div>
+
+      <!-- NAVIGASI HURUF ALFABET -->
+      <div id="alphabetNav" class="alphabet-nav"></div>
+
+      <!-- CONTAINER KELOMPOK KOSAKATA -->
+      <div id="vocabContainer"></div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- BAGIAN 2: PROFESSIONAL PHRASES (1-27) -->
+    <!-- =================================================================== -->
+    <section id="phrasesSection" style="display: none;">
+      <div class="section-title-wrapper" style="margin-bottom: 18px;">
+        <h3 style="color: var(--color-navy); font-size: 1.4rem; margin-bottom: 4px;">💬 Professional Phrases & Client Talks</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">27 frasa komunikasi perkantoran siap pakai beserta padanan Business English.</p>
+      </div>
+
+      <!-- CONTAINER DAFTAR FRASA -->
+      <div id="phrasesContainer" class="phrases-grid"></div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- BAGIAN 3: INTERACTIVE OFFICE DIALOGUES (PERCAKAPAN LENGKAP 2 ARAH) -->
+    <!-- =================================================================== -->
+    <section id="dialoguesSection" style="display: none;">
+      <div class="section-title-wrapper" style="margin-bottom: 24px;">
+        <h3 style="color: var(--color-navy); font-size: 1.4rem; margin-bottom: 4px;">🎭 Interactive Office Dialogues (Percakapan Kantor Bilingual)</h3>
+        <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+          Simulasi percakapan dua arah antara Staf Resepsionis/Administrasi SMK dan Tamu/Klien, dilengkapi catatan etika, intonasi, dan bahasa tubuh (proyektor-friendly tanpa audio).
+        </p>
+      </div>
+
+      <div id="dialoguesContainer">
+        <!-- DIALOGUE 1: MENYAMBUT TAMU & MENANYAKAN JANJI TEMU -->
+        <div class="dialogue-card" data-keywords="menyambut tamu appointment janji temu greeting resepsionis front office">
+          <span class="dialogue-badge">Situasi 1: Front Office Reception</span>
+          <h4 style="font-size: 1.3rem; color: #0A1E5E; margin: 6px 0 14px 0;">Menyambut Tamu Kantor & Menanyakan Maksud / Janji Temu</h4>
+          <p style="color: #64748B; font-size: 0.9rem; margin-bottom: 18px;">
+            Staf resepsionis menyambut kedatangan tamu bisnis dengan prinsip 3S (Senyum, Salam, Sapa) dan memeriksa jadwal janji temu secara profesional.
+          </p>
+
+          <div class="chat-flow-container">
+            <!-- Turn 1: Resepsionis -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">👩‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Resepsionis (Front Office Staf)</div>
+                <div class="text-indonesia">"Selamat pagi, Bapak/Ibu. Selamat datang di SpeakOffice. Ada yang bisa saya bantu hari ini?"</div>
+                <div class="text-english">"Good morning, Sir/Ma'am. Welcome to SpeakOffice. How may I assist you today?"</div>
+              </div>
+            </div>
+
+            <!-- Turn 2: Tamu -->
+            <div class="chat-bubble-row">
+              <div class="chat-avatar avatar-guest">👨‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Tamu Klien (Mr. William)</div>
+                <div class="text-indonesia">"Selamat pagi. Saya William dari PT Sinar Mitra. Saya ada janji temu dengan Bapak Hendra dari Divisi Pemasaran pukul 10.00."</div>
+                <div class="text-english">"Good morning. I am William from PT Sinar Mitra. I have a scheduled appointment with Mr. Hendra from the Marketing Division at 10:00 AM."</div>
+              </div>
+            </div>
+
+            <!-- Turn 3: Resepsionis -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">👩‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Resepsionis (Front Office Staf)</div>
+                <div class="text-indonesia">"Baik, Pak William. Mohon kesediaannya untuk mengisi buku tamu resepsionis terlebih dahulu. Saya akan segera mengonfirmasi kedatangan Bapak kepada sekretaris Pak Hendra."</div>
+                <div class="text-english">"Certainly, Mr. William. Would you please fill out our guest logbook first? I will immediately inform Mr. Hendra's secretary of your arrival."</div>
+              </div>
+            </div>
+
+            <!-- Turn 4: Resepsionis -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">👩‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Resepsionis (Front Office Staf)</div>
+                <div class="text-indonesia">"Silakan duduk dan menikmati minuman di ruang tunggu eksekutif kami. Pak Hendra akan segera menemui Bapak dalam 5 menit."</div>
+                <div class="text-english">"Please have a seat and enjoy some refreshments in our executive lounge. Mr. Hendra will be with you in five minutes."</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tips Etika & Sikap -->
+          <div class="etiquette-tips-box">
+            <div class="tips-title">💡 Catatan Etika & Tips Sikap Profesional:</div>
+            <ul class="tips-list">
+              <li><strong>Intonasi Suara:</strong> Gunakan nada yang hangat, tempo bicara tidak terburu-buru, dan artikulasi vokal yang jelas (smiling voice).</li>
+              <li><strong>Kontak Mata & Senyum:</strong> Jaga kontak mata sopan (eye contact) sekitar 60–70% waktu berbicara, sertai senyum ramah yang tulus.</li>
+              <li><strong>Bahasa Tubuh:</strong> Posisi tubuh berdiri atau duduk tegak, tangan terbuka di atas meja resepsionis, arahkan ruang tunggu dengan telapak tangan terbuka (bukan menunjuk satu jari).</li>
+              <li><strong>Kata Kunci Kesopanan:</strong> <em>"How may I assist you?"</em>, <em>"Would you please..."</em>, <em>"Certainly"</em>.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- DIALOGUE 2: MEMBERITAHUKAN PIMPINAN SEDANG MAKAN SIANG / RAPAT / DINAS -->
+        <div class="dialogue-card" data-keywords="pimpinan rapat makan siang dinas luar reschedule appointment janji temu sopan menolak halus">
+          <span class="dialogue-badge">Situasi 2: Executive Availability & Rescheduling</span>
+          <h4 style="font-size: 1.3rem; color: #0A1E5E; margin: 6px 0 14px 0;">Memberitahukan Secara Santun Bahwa Pimpinan Sedang Makan Siang / Rapat</h4>
+          <p style="color: #64748B; font-size: 0.9rem; margin-bottom: 18px;">
+            Menghadapi tamu yang mendesak ingin bertemu pimpinan yang sedang berhalangan (makan siang/rapat/dinas luar kota) tanpa memicu ketegangan, serta menawarkan penjadwalan ulang secara elegan.
+          </p>
+
+          <div class="chat-flow-container">
+            <!-- Turn 1: Tamu -->
+            <div class="chat-bubble-row">
+              <div class="chat-avatar avatar-guest">👨‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Tamu Tanpa Janji (Pak Robert)</div>
+                <div class="text-indonesia">"Selamat siang. Saya harus segera bertemu langsung dengan Ibu Direktur sekarang juga terkait dokumen tender penting."</div>
+                <div class="text-english">"Good afternoon. I need to see the Managing Director immediately regarding urgent tender documents."</div>
+              </div>
+            </div>
+
+            <!-- Turn 2: Resepsionis -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">👩‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Resepsionis (Front Office Staf)</div>
+                <div class="text-indonesia">"Selamat siang, Pak Robert. Mohon maaf sebelumnya, apakah Bapak sudah memiliki janji temu resmi dengan Ibu Direktur hari ini?"</div>
+                <div class="text-english">"Good afternoon, Mr. Robert. My apologies, but do you happen to have a pre-scheduled appointment with the Director for today?"</div>
+              </div>
+            </div>
+
+            <!-- Turn 3: Tamu -->
+            <div class="chat-bubble-row">
+              <div class="chat-avatar avatar-guest">👨‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Tamu Tanpa Janji (Pak Robert)</div>
+                <div class="text-indonesia">"Saya belum sempat membuat janji, tapi urusan ini sangat mendesak dan tidak bisa ditunda!"</div>
+                <div class="text-english">"I didn't have time to book an appointment, but this matter is extremely urgent and cannot be delayed!"</div>
+              </div>
+            </div>
+
+            <!-- Turn 4: Resepsionis -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">👩‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Resepsionis (Front Office Staf)</div>
+                <div class="text-indonesia">"Saya sangat memahami urgensi urusan Bapak. Namun, mohon maaf saat ini Ibu Direktur sedang istirahat makan siang dan akan segera memimpin rapat koordinasi tertutup hingga sore hari, sehingga beliau belum dapat menerima kunjungan tanpa konfirmasi terlebih dahulu."</div>
+                <div class="text-english">"I completely understand the urgency of your matter, Mr. Robert. However, the Director is currently on a lunch break and will immediately chair a closed coordination meeting until late afternoon, so she is unable to take unscheduled meetings."</div>
+              </div>
+            </div>
+
+            <!-- Turn 5: Resepsionis -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">👩‍💼</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Resepsionis (Front Office Staf)</div>
+                <div class="text-indonesia">"Sebagai solusi, saya dapat mencatatkan pesan Bapak di lembar disposisi prioritas atau membantu menjadwalkan ulang janji temu resmi besok pagi pukul 09.00. Apakah opsi tersebut berkenan bagi Bapak?"</div>
+                <div class="text-english">"As an alternative, I can record your detailed message in our priority memo or help you schedule a formal appointment for tomorrow at 9:00 AM. Would that work for you, Sir?"</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tips Etika & Sikap -->
+          <div class="etiquette-tips-box">
+            <div class="tips-title">💡 Catatan Etika & Tips Sikap Profesional:</div>
+            <ul class="tips-list">
+              <li><strong>Intonasi Suara:</strong> Tenang, empatik, stabil, tidak gugup atau defensif saat tamu berbicara dengan nada tinggi.</li>
+              <li><strong>Teknik Komunikasi (Empathy First):</strong> Akui perasaan dan urgensi tamu terlebih dahulu (<em>"I completely understand your urgency..."</em>) sebelum menyampaikan ketidaksediaan pimpinan.</li>
+              <li><strong>Solusi Alternatif (Win-Win):</strong> Jangan pernah hanya mengatakan "tidak bisa". Selalu berikan alternatif konkret (mencatat pesan, menghubungkan divisi terkait, atau menjadwalkan ulang pertemuan).</li>
+              <li><strong>Bahasa Tubuh:</strong> Tangan diletakkan sopan di depan perut/meja, mengangguk mendengarkan dengan penuh respek, menjaga ekspresi wajah tetap tenang dan ramah.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- DIALOGUE 3: MENERIMA & MENYAMBUNGKAN PANGGILAN TELEPON KANTOR -->
+        <div class="dialogue-card" data-keywords="telepon telephone call transferring extension sambungkan divisi operator hold">
+          <span class="dialogue-badge">Situasi 3: Professional Telephone Handling</span>
+          <h4 style="font-size: 1.3rem; color: #0A1E5E; margin: 6px 0 14px 0;">Menerima & Menyambungkan Panggilan Telepon ke Divisi Terkait</h4>
+          <p style="color: #64748B; font-size: 0.9rem; margin-bottom: 18px;">
+            Menerima panggilan masuk maksimal 3 deringan, menanyakan identitas penelpon dengan santun, meminta izin menahan panggilan (holding), dan mentransfer ke ekstensi tujuan.
+          </p>
+
+          <div class="chat-flow-container">
+            <!-- Turn 1: Operator -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">📞</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Staf Administrasi / Teleponis</div>
+                <div class="text-indonesia">"Selamat pagi, SpeakOffice. Dengan Naura di sini, ada yang bisa saya bantu?"</div>
+                <div class="text-english">"Good morning, SpeakOffice. This is Naura speaking, how may I assist you?"</div>
+              </div>
+            </div>
+
+            <!-- Turn 2: Penelepon -->
+            <div class="chat-bubble-row">
+              <div class="chat-avatar avatar-guest">👤</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Penelepon Eksternal (Mr. Jason)</div>
+                <div class="text-indonesia">"Halo, selamat pagi. Bisa tolong sambungkan saya dengan Ibu Sarah di Bagian Keuangan?"</div>
+                <div class="text-english">"Hello, good morning. Could you please connect me to Mrs. Sarah in the Finance Department?"</div>
+              </div>
+            </div>
+
+            <!-- Turn 3: Operator -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">📞</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Staf Administrasi / Teleponis</div>
+                <div class="text-indonesia">"Dengan senang hati. Boleh saya tahu dengan siapa saya berbicara dan dari instansi mana, Pak?"</div>
+                <div class="text-english">"Certainly. May I know who is calling and from which company, please?"</div>
+              </div>
+            </div>
+
+            <!-- Turn 4: Penelepon -->
+            <div class="chat-bubble-row">
+              <div class="chat-avatar avatar-guest">👤</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Penelepon Eksternal (Mr. Jason)</div>
+                <div class="text-indonesia">"Saya Jason Lee dari Global Logistics Singapore mengenai pembayaran faktur nomor 402."</div>
+                <div class="text-english">"I am Jason Lee from Global Logistics Singapore regarding invoice payment number 402."</div>
+              </div>
+            </div>
+
+            <!-- Turn 5: Operator -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">📞</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Staf Administrasi / Teleponis</div>
+                <div class="text-indonesia">"Baik, Pak Jason. Mohon tunggu sebentar, saya akan sambungkan panggilan Bapak ke ekstensi Ibu Sarah. Jangan ditutup terlebih dahulu ya, Pak."</div>
+                <div class="text-english">"Thank you, Mr. Jason. Please hold on for a moment while I transfer your call to Mrs. Sarah's extension. Kindly stay on the line."</div>
+              </div>
+            </div>
+
+            <!-- Turn 6: Operator (Menghubungkan) -->
+            <div class="chat-bubble-row receptionist-row">
+              <div class="chat-avatar avatar-receptionist">📞</div>
+              <div class="bubble-content">
+                <div class="speaker-name">Staf Administrasi / Teleponis (Kembali ke Saluran)</div>
+                <div class="text-indonesia">"Terima kasih telah menunggu dengan sabar, Pak Jason. Panggilan sudah terhubung dengan Ibu Sarah. Selamat melanjutkan pembicaraan."</div>
+                <div class="text-english">"Thank you for your patience, Mr. Jason. You are now connected with Mrs. Sarah. Have a great discussion."</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tips Etika & Sikap -->
+          <div class="etiquette-tips-box">
+            <div class="tips-title">💡 Catatan Etika & Tips Sikap Profesional:</div>
+            <ul class="tips-list">
+              <li><strong>Kecepatan Merespons:</strong> Angkat gagang telepon pada deringan ke-2 atau paling lambat ke-3 untuk mencerminkan kesiapsiagaan instansi.</li>
+              <li><strong>Smiling Voice & Artikulasi:</strong> Tersenyumlah saat berbicara di telepon; senyuman akan mengubah resonansi vokal sehingga suara terdengar lebih ramah dan berenergi positif.</li>
+              <li><strong>Etika Mode Tahan (Hold):</strong> Selalu minta izin sebelum menekan tombol hold (<em>"Please hold on for a moment..."</em>). Jangan biarkan penelepon menunggu lebih dari 45 detik tanpa kabar.</li>
+              <li><strong>Konfirmasi Nama:</strong> Catat nama penelepon di notes kerja dan gunakan namanya saat menyambungkan kembali (<em>"Thank you for holding, Mr. Jason..."</em>).</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HASIL PENCARIAN KOSONG -->
+    <div id="searchNoResult" class="search-no-result" style="display: none;">
+      <div style="font-size: 3rem; margin-bottom: 12px;">🔍</div>
+      <h4 style="color: var(--color-navy); margin-bottom: 8px;">Istilah atau Frasa Tidak Ditemukan</h4>
+      <p>Coba gunakan kata kunci lain yang relevan dengan administrasi perkantoran atau nama situasi.</p>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p>SpeakOffice &copy; 2026 - Speak Professionally, Serve Excellently</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT DATABASE KOSAKATA & FRASA -->
+  <script>
+    // 1. Professional Vocabulary (56 Istilah A-Z)
+    const vocabularyData = [
+      { term: "Agenda", en: "Correspondence Register", def: "Buku catatan resmi untuk mencatat surat masuk dan surat keluar harian instansi." },
+      { term: "Agenda Pimpinan", en: "Executive Schedule", def: "Jadwal kegiatan resmi harian, mingguan, atau bulanan seorang pimpinan." },
+      { term: "Akuntabilitas", en: "Accountability", def: "Kewajiban pemegang jabatan untuk mempertanggungjawabkan pengelolaan dan hasil kerja instansi." },
+      { term: "Alur Dokumen", en: "Workflow", def: "Jalur atau tahapan pergerakan dokumen dari satu bagian ke bagian lain dalam proses administrasi." },
+      { term: "Autentikasi", en: "Authentication", def: "Proses pembuktian keabsahan atau keaslian suatu naskah dinas, tanda tangan, atau dokumen digital." },
+      { term: "Berita Acara", en: "Minutes of Event", def: "Naskah dinas yang berisi keterangan resmi mengenai suatu kejadian, pelaksanaan kegiatan, serah terima, atau pemeriksaan." },
+      { term: "Benturan Kepentingan", en: "Conflict of Interest", def: "Kondisi di mana pejabat/staf memiliki kepentingan pribadi yang dapat mempengaruhi objektivitas tugas kedinasan." },
+      { term: "Birokrasi", en: "Bureaucracy", def: "Sistem tata pemerintahan yang dijalankan oleh pegawai pemerintah berdasarkan aturan berjenjang yang tegas." },
+      { term: "Briefing", en: "Briefing / Pre-Shift Meeting", def: "Pengarahan singkat yang diberikan oleh pimpinan kepada staf sebelum memulai kegiatan atau proyek kerja." },
+      { term: "Buku Tamu", en: "Guest Logbook", def: "Buku pencatatan identitas dan keperluan tamu yang berkunjung ke instansi atau perusahaan." },
+      { term: "Chief Executive Officer (CEO)", en: "Chief Executive Officer", def: "Pimpinan tertinggi dalam suatu struktur organisasi perusahaan yang bertanggung jawab atas operasional keseluruhan." },
+      { term: "Confidential", en: "Confidential Document", def: "Klasifikasi keamanan dokumen yang hanya boleh diakses oleh pihak-pihak tertentu yang berwenang." },
+      { term: "Copier", en: "Photocopier Machine", def: "Perangkat perkantoran esensial untuk penggandaan dokumen fisik." },
+      { term: "Delegasi", en: "Delegation of Authority", def: "Pelimpahan wewenang dan tanggung jawab tertentu dari pimpinan kepada pejabat atau staf di bawahnya." },
+      { term: "Disposisi", en: "Executive Disposition", def: "Catatan berupa petunjuk tertulis singkat dari pimpinan mengenai tindak lanjut penanganan surat masuk." },
+      { term: "Distribusi Dokumen", en: "Document Distribution", def: "Proses penyebaran naskah dinas atau surat kepada unit kerja yang berhak menerima." },
+      { term: "Drafting", en: "Document Drafting", def: "Tahap penyusunan rancangan awal naskah dinas, surat, atau regulasi sebelum dikoreksi dan disahkan." },
+      { term: "E-Filing", en: "Electronic Filing System", def: "Sistem penyimpanan arsip digital di dalam komputer, server, atau cloud berbasis folder terstruktur." },
+      { term: "Efisiensi Administratif", en: "Administrative Efficiency", def: "Ukuran keberhasilan kerja kantor dalam mencapai hasil maksimal dengan pengorbanan sumber daya seminimal mungkin." },
+      { term: "Etika Profesi", en: "Professional Ethics", def: "Standar perilaku, nilai, dan moral yang wajib dijunjung tinggi oleh pegawai dalam menjalankan tugas kedinasan." },
+      { term: "Ekspedisi", en: "Expedition Book", def: "Buku pengantar atau bukti penyerahan surat/dokumen kepada pihak luar atau antarbagian internal." },
+      { term: "Filing System", en: "Records Filing System", def: "Sistem pengelompokan, penataan, dan penyimpanan arsip agar mudah ditemukan kembali dengan cepat." },
+      { term: "Follow-Up", en: "Follow-Up Action", def: "Langkah lanjutan yang harus segera dikerjakan berdasarkan instruksi disposisi atau hasil keputusan rapat." },
+      { term: "Front Office", en: "Front Office Reception", def: "Divisi terdepan yang bertugas menyambut tamu, melayani komunikasi telepon, dan memberikan informasi awal." },
+      { term: "Good Governance", en: "Good Public Governance", def: "Prinsip penyelenggaraan manajemen instansi yang transparan, akuntabel, adil, dan taat hukum." },
+      { term: "Gratifikasi", en: "Gratification / Bribery Control", def: "Pemberian dalam arti luas (uang, barang, diskon, fasilitas) kepada pegawai yang berpotensi menimbulkan benturan kepentingan." },
+      { term: "Handling Complaints", en: "Service Recovery", def: "Proses penerimaan, analisis, dan penyelesaian keluhan klien secara cepat, empatik, dan beretika." },
+      { term: "Hard Copy", en: "Physical Paper Document", def: "Salinan dokumen fisik yang dicetak di atas kertas." },
+      { term: "Human Relations", en: "Interpersonal Relations", def: "Hubungan kerja sama yang harmonis antarsesama pegawai atau antara staf dengan pimpinan di tempat kerja." },
+      { term: "Indeks Surat", en: "Filing Index / Classification Code", def: "Tanda pengenal berkas yang disusun berdasarkan sistem abjad, subjek, wilayah, atau nomor arsip." },
+      { term: "Integritas", en: "Integrity", def: "Kesesuaian yang utuh antara tindakan, perkataan, dan prinsip etika moral kejujuran kerja." },
+      { term: "Inventaris Kantor", en: "Office Inventory", def: "Daftar seluruh barang perlengkapan, peralatan, dan aset milik kantor." },
+      { term: "Jadwal Retensi Arsip (JRA)", en: "Records Retention Schedule", def: "Daftar pedoman masa simpan arsip sebelum dipindahkan, dinilai, atau dimusnahkan sesuai regulasi." },
+      { term: "Kerahasiaan Dokumen", en: "Document Confidentiality", def: "Kewajiban hukum untuk menjaga dan tidak membocorkan isi naskah dinas berkategori rahasia." },
+      { term: "Klarifikasi", en: "Clarification", def: "Tindakan meminta penjelasan atau penegasan lebih lanjut untuk menghindari kesalahpahaman." },
+      { term: "Korespondensi", en: "Business Correspondence", def: "Aktivitas surat-menyurat resmi antarinstansi atau antarlembaga bisnis." },
+      { term: "Legalitas", en: "Legal Validity", def: "Keabsahan suatu dokumen dinas sesuai ketentuan perundang-undangan yang berlaku." },
+      { term: "Logbook", en: "Activity Logbook", def: "Buku catatan kronologis yang mencatat aktivitas harian staf atau operasional mesin kantor." },
+      { term: "Memorandum (Memo)", en: "Internal Memorandum", def: "Naskah dinas intern yang bersifat ringkas dari pimpinan kepada bawahan atau antarpejabat sederajat." },
+      { term: "Minutes of Meeting (MoM)", en: "Minutes of Meeting", def: "Catatan resmi jalannya rapat, hasil keputusan, dan rencana aksi (action points) yang disetujui." },
+      { term: "Naskah Dinas", en: "Official Records / Documents", def: "Informasi tertulis sebagai alat komunikasi kedinasan yang dibuat dan/atau dikeluarkan oleh pejabat berwenang." },
+      { term: "Nomor Registrasi", en: "Document Reference Number", def: "Nomor urut penomoran naskah dinas sesuai tata persuratan baku." },
+      { term: "Notula Rapat", en: "Meeting Minutes", def: "Ringkasan tertulis yang sah mengenai jalannya suatu persidangan atau rapat dinas." },
+      { term: "Pelayanan Prima", en: "Service Excellence", def: "Pelayanan terbaik yang melampaui harapan standar pengguna layanan atau tamu kantor." },
+      { term: "Pemusnahan Arsip", en: "Records Destruction", def: "Prosedur penghancuran fisik arsip yang sudah habis masa retensinya sesuai ketentuan peraturan perundang-undangan." },
+      { term: "Pengarsipan", en: "Records Archiving", def: "Aktivitas menyimpan dan mengelola rekaman data instansi secara sistematis." },
+      { term: "Penyusutan Arsip", en: "Records Disposition", def: "Pengurangan jumlah arsip melalui pemindahan arsip inaktif, pemusnahan, atau penyerahan ke lembaga kearsipan." },
+      { term: "Protokoler", en: "Diplomatic Protocol", def: "Serangkaian aturan atau tata tertib kehormatan dalam acara resmi kenegaraan atau instansi." },
+      { term: "Redaction", en: "Document Redaction", def: "Penghapusan atau penyensoran informasi sensitif sebelum dokumen dibuka ke publik." },
+      { term: "Regulasi", en: "Regulatory Framework", def: "Peraturan yang ditetapkan oleh otoritas resmi untuk mengendalikan suatu aktivitas administratif." },
+      { term: "Retensi", en: "Retention Period", def: "Jangka waktu penyimpanan minimal suatu dokumen sebelum boleh dimusnahkan." },
+      { term: "Risalah Rapat", en: "Proceedings of Meeting", def: "Catatan lengkap jalannya pembicaraan dalam rapat dinas." },
+      { term: "Salinan Dokumen", en: "Document Duplicate / Certified Copy", def: "Reproduksi naskah dinas yang disahkan keasliannya oleh pejabat berwenang." },
+      { term: "Service Excellence", en: "Service Excellence", def: "Standar pelayanan prima yang cepat, tepat, ramah, dan solutif." },
+      { term: "SOP (Standar Operasional Prosedur)", en: "Standard Operating Procedure (SOP)", def: "Pedoman tertulis terinci yang memandu staf dalam menyelesaikan tugas operasional." },
+      { term: "Surat Dinas", en: "Official Letter", def: "Surat resmi yang diterbitkan oleh instansi untuk urusan kedinasan." }
+    ];
+
+    // 2. Professional Phrases (1-27 Frasa Berurutan)
+    const phrasesData = [
+      { no: 1, category: "Penerimaan Tamu Kantor", idText: "Selamat pagi, selamat datang di SpeakOffice. Ada yang bisa saya bantu terkait janji temu hari ini?", enText: "Good morning, welcome to SpeakOffice. How may I assist you with your appointment today?" },
+      { no: 2, category: "Penerimaan Tamu Kantor", idText: "Mohon kesediaannya untuk mengisi buku tamu resepsionis terlebih dahulu sebelum menuju ruang tunggu pimpinan.", enText: "Would you please fill out the guest logbook first before proceeding to the executive lounge?" },
+      { no: 3, category: "Pemberitahuan Pimpinan Rapat", idText: "Pimpinan saat ini sedang memimpin rapat tertutup, mohon berkenan menunggu sekitar 10 menit di ruang tamu eksekutif.", enText: "The executive is currently chairing a closed meeting, please kindly wait for about 10 minutes in the executive lounge." },
+      { no: 4, category: "Etika Bertelepon Kantor", idText: "Selamat siang, SpeakOffice dengan Naura di sini. Boleh saya tahu dengan siapa saya berbicara?", enText: "Good afternoon, SpeakOffice. This is Naura speaking. May I know who is calling, please?" },
+      { no: 5, category: "Etika Bertelepon Kantor", idText: "Mohon tunggu sebentar, saya akan segera menyambungkan panggilan Bapak ke bagian keuangan.", enText: "Please hold on for a moment, I will transfer your call to the finance department." },
+      { no: 6, category: "Manajemen Perjalanan Dinas", idText: "Tolong siapkan surat tugas, tiket penerbangan, dan reservasi hotel untuk agenda dinas pimpinan minggu depan.", enText: "Please prepare the assignment letter, flight tickets, and hotel reservation for the executive's business trip next week." },
+      { no: 7, category: "Penanganan Keluhan (Handling Complaints)", idText: "Mohon maaf atas ketidaknyamanan ini, saya akan segera koordinasikan solusi terbaik dengan divisi terkait dalam waktu 15 menit.", enText: "I apologize for the inconvenience, I will coordinate the best solution with the relevant department within 15 minutes." },
+      { no: 8, category: "Pengelolaan Dokumen Rahasia (Redaction)", idText: "Pastikan untuk menutup atau menyensor bagian data pribadi yang bersifat rahasia sebelum dokumen ini dipublikasikan.", enText: "Make sure to redact confidential personal data sections before this document is published." },
+      { no: 9, category: "Pencatatan Notula Rapat (Verbatim)", idText: "Tuliskan notula rapat pleno ini secara rinci kata demi kata tanpa ada poin diskusi yang terlewat.", enText: "Please take the minutes of this plenary meeting verbatim without missing any discussion points." },
+      { no: 10, category: "Pengadaan Logistik & Inventaris Kantor", idText: "Silakan periksa kembali daftar inventaris alat tulis kantor yang stoknya sudah menipis untuk diajukan pengadaannya.", enText: "Please review the office supplies inventory list that is running low to submit a procurement request." },
+      { no: 11, category: "Pelimpahan Wewenang (Delegation)", idText: "Selama pimpinan dinas luar kota, wewenang penandatanganan surat keluar rutin didelegasikan kepada kepala subbagian.", enText: "During the executive's business trip, the authority to sign routine outgoing letters is delegated to the sub-division head." },
+      { no: 12, category: "Pengendalian Gratifikasi", idText: "Segera buatkan berita acara penolakan hadiah atau gratifikasi ini dan laporkan ke Unit Pengendali Gratifikasi dalam 1x24 jam.", enText: "Immediately create a minutes of refusal for this gift or gratification and report it to the Gratification Control Unit within 24 hours." },
+      { no: 13, category: "Penyusunan Nota Dinas Internal", idText: "Kirimkan nota dinas internal ini kepada seluruh kepala bidang untuk segera ditindaklanjuti hari ini.", enText: "Send this inter-office memorandum to all division heads for immediate follow-up today." },
+      { no: 14, category: "Validasi Berita Acara Serah Terima (BAST)", idText: "Pastikan fisik barang pengadaan sudah diperiksa secara teliti sebelum menandatangani berita acara serah terima.", enText: "Ensure the physical procured goods are thoroughly inspected before signing the minutes of acceptance and delivery." },
+      { no: 15, category: "Manajemen Arsip Digital & E-Filing", idText: "Lakukan pemindaian seluruh surat masuk dan unggah ke dalam direktori e-filing dengan penamaan file yang seragam.", enText: "Scan all incoming letters and upload them into the e-filing directory with standardized file naming." },
+      { no: 16, category: "Pengendalian Benturan Kepentingan", idText: "Staf yang memiliki hubungan kekerabatan dengan peserta tender wajib menyatakan benturan kepentingan secara tertulis.", enText: "Staff members who have a familial relationship with tender participants must declare a conflict of interest in writing." },
+      { no: 17, category: "Konfirmasi Jadwal Pimpinan", idText: "Saya mengonfirmasi ulang bahwa jadwal audiensi dengan pihak mitra diubah menjadi hari rabu pukul 14.00.", enText: "I am re-confirming that the audience schedule with the partner has been rescheduled to Wednesday at 2:00 PM." },
+      { no: 18, category: "Penyusunan Standar Operasional Prosedur (SOP)", idText: "Divisi administrasi sedang menyempurnakan draf SOP pelayanan terpadu satu pintu untuk tahun anggaran mendatang.", enText: "The administration division is finalizing the draft of the one-stop integrated service SOP for the upcoming fiscal year." },
+      { no: 19, category: "Distribusi Dokumen Klasifikasi Terbatas", idText: "Gunakan sampul ganda berlapis lak tatkala mengirimkan dokumen naskah dinas berklasifikasi rahasia tersebut.", enText: "Use a double-layered wax-sealed cover when transmitting those classified confidential official documents." },
+      { no: 20, category: "Pelaporan Kinerja / Akuntabilitas", idText: "Laporan akuntabilitas kinerja instansi pemerintah (LKIP) wajib diserahkan tepat waktu sebelum akhir triwulan.", enText: "The government agency performance accountability report must be submitted on time before the end of the quarter." },
+      { no: 21, category: "Percakapan Klien: Menyambut Tamu di Front Office", idText: "Selamat pagi, Bapak. Apakah Bapak sudah memiliki janji temu dengan Manajer Operasional kami sebelumnya?", enText: "Good morning, Sir. Do you happen to have a pre-scheduled appointment with our Operations Manager today?" },
+      { no: 22, category: "Percakapan Klien: Menawarkan Minuman", idText: "Silakan duduk di ruang tamu eksekutif, apakah Anda berkenan menikmati teh hangat atau secangkir kopi selagi menunggu?", enText: "Please make yourself comfortable in the executive lounge. May I offer you some warm tea or a cup of coffee while you wait?" },
+      { no: 23, category: "Percakapan Klien: Pimpinan Sedang Berhalangan", idText: "Mohon maaf atas ketidaknyamanannya, Direktur Utama saat ini sedang dalam perjalanan dinas ke luar kota. Apakah berkenan jika dijadwalkan ulang besok pagi?", enText: "I apologize for the inconvenience, but our Managing Director is currently on an official business trip. Would it be convenient for you to reschedule for tomorrow morning?" },
+      { no: 24, category: "Percakapan Klien: Menghubungkan Telepon Internasional", idText: "Terima kasih telah bersedia menunggu, saya sedang menyambungkan sambungan telepon Anda ke kantor perwakilan regional.", enText: "Thank you for holding, I am currently connecting your call to our regional representative office." },
+      { no: 25, category: "Percakapan Klien: Konfirmasi Penandatanganan Kontrak", idText: "Kami telah menerima berkas perjanjian kerja sama dan siap memfasilitasi sesi penandatanganan nota kesepahaman besok lusa.", enText: "We have safely received the partnership agreement files and are prepared to facilitate the Memorandum of Understanding signing session the day after tomorrow." },
+      { no: 26, category: "Percakapan Klien: Penanganan Komplain Formal", idText: "Kami sangat mengapresiasi masukan berharga dari Bapak. Keluhan ini telah dicatat dalam sistem dan tim khusus akan memberikan laporan penyelesaian hari ini.", enText: "We deeply appreciate your valuable feedback, Sir. This complaint has been officially registered, and our dedicated team will provide a resolution report today." },
+      { no: 27, category: "Percakapan Klien: Salam Perpisahan & Apresiasi", idText: "Terima kasih banyak atas kunjungan kerja dan diskusi yang sangat produktif hari ini. Semoga perjalanan pulang Anda menyenangkan.", enText: "Thank you very much for your productive business visit today. We wish you a safe and pleasant journey back." }
+    ];
+
+    // =========================================================================
+    // LOGIKA TAB & RENDER
+    // =========================================================================
+    let currentActiveTab = 'VOCAB';
+
+    function switchMainTab(tabName) {
+      currentActiveTab = tabName;
+      
+      const btn1 = document.getElementById('tabBtn1');
+      const btn2 = document.getElementById('tabBtn2');
+      const btn3 = document.getElementById('tabBtn3');
+
+      const sec1 = document.getElementById('vocabSection');
+      const sec2 = document.getElementById('phrasesSection');
+      const sec3 = document.getElementById('dialoguesSection');
+
+      btn1.classList.remove('active');
+      btn2.classList.remove('active');
+      btn3.classList.remove('active');
+
+      sec1.style.display = 'none';
+      sec2.style.display = 'none';
+      sec3.style.display = 'none';
+
+      if (tabName === 'VOCAB') {
+        btn1.classList.add('active');
+        sec1.style.display = 'block';
+      } else if (tabName === 'PHRASES') {
+        btn2.classList.add('active');
+        sec2.style.display = 'block';
+      } else if (tabName === 'DIALOGUES') {
+        btn3.classList.add('active');
+        sec3.style.display = 'block';
+      }
+
+      window.scrollTo({ top: 180, behavior: 'smooth' });
+    }
+
+    // Inisialisasi Tampilan
+    function renderPage() {
+      renderAlphabetNav();
+      renderVocabularyGrouped(vocabularyData);
+      renderPhrasesList(phrasesData);
+    }
+
+    // Render Alfabet A-Z
+    function renderAlphabetNav() {
+      const alphabetNav = document.getElementById('alphabetNav');
+      alphabetNav.innerHTML = '';
+
+      const letters = [...new Set(vocabularyData.map(item => item.term[0].toUpperCase()))].sort();
+      
+      const allBtn = document.createElement('button');
+      allBtn.className = 'alphabet-btn active';
+      allBtn.innerText = 'Semua (A-Z)';
+      allBtn.onclick = () => {
+        document.querySelectorAll('.alphabet-btn').forEach(b => b.classList.remove('active'));
+        allBtn.classList.add('active');
+        renderVocabularyGrouped(vocabularyData);
+      };
+      alphabetNav.appendChild(allBtn);
+
+      letters.forEach(letter => {
+        const btn = document.createElement('button');
+        btn.className = 'alphabet-btn';
+        btn.innerText = letter;
+        btn.onclick = () => {
+          document.querySelectorAll('.alphabet-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const filtered = vocabularyData.filter(item => item.term[0].toUpperCase() === letter);
+          renderVocabularyGrouped(filtered);
+        };
+        alphabetNav.appendChild(btn);
+      });
+    }
+
+    // Render Vocabulary Terkelompok Abjad
+    function renderVocabularyGrouped(data) {
+      const container = document.getElementById('vocabContainer');
+      container.innerHTML = '';
+
+      const grouped = {};
+      data.forEach(item => {
+        const letter = item.term[0].toUpperCase();
+        if (!grouped[letter]) grouped[letter] = [];
+        grouped[letter].push(item);
+      });
+
+      const sortedLetters = Object.keys(grouped).sort();
+
+      sortedLetters.forEach(letter => {
+        const letterHeader = document.createElement('div');
+        letterHeader.className = 'letter-divider';
+        letterHeader.innerText = letter;
+        container.appendChild(letterHeader);
+
+        const grid = document.createElement('div');
+        grid.className = 'vocab-grid';
+
+        grouped[letter].forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'vocab-card';
+          card.innerHTML = `
+            <div style="font-weight: 800; font-size: 1.15rem; color: var(--color-navy); margin-bottom: 8px;">
+              ${item.term}
+            </div>
+            <div style="color: var(--color-royal); font-weight: 700; font-size: 0.95rem; margin-bottom: 12px; font-style: italic;">
+              "${item.en}"
+            </div>
+            <div style="background: var(--bg-soft-blue); padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;">
+              <strong>Definisi:</strong> ${item.def}
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+      });
+    }
+
+    // Render Frasa 1-27
+    function renderPhrasesList(data) {
+      const container = document.getElementById('phrasesContainer');
+      container.innerHTML = '';
+
+      data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'phrase-card';
+        card.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span class="category-tag">${item.category}</span>
+              <span style="background: var(--color-navy); color: white; font-size: 0.75rem; font-weight: 700; padding: 2px 8px; border-radius: 4px;">#${item.no}</span>
+            </div>
+            <div class="lang-block">
+              <div class="lang-label">Bahasa Indonesia</div>
+              <div class="lang-text">"${item.idText}"</div>
+            </div>
+            <div class="lang-block" style="margin-top: 12px; border-top: 1px dashed #E2E8F0; padding-top: 10px;">
+              <div class="lang-label">Business English</div>
+              <div class="lang-text" style="color: var(--color-royal);">"${item.enText}"</div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // FILTER REAL-TIME PENCARIAN
+    function filterContent() {
+      const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+      const vocabSec = document.getElementById('vocabSection');
+      const phraseSec = document.getElementById('phrasesSection');
+      const dialogSec = document.getElementById('dialoguesSection');
+      const noResult = document.getElementById('searchNoResult');
+
+      if (!keyword) {
+        // Tampilkan tab yang sedang aktif
+        switchMainTab(currentActiveTab);
+        noResult.style.display = 'none';
+        renderVocabularyGrouped(vocabularyData);
+        renderPhrasesList(phrasesData);
+        return;
+      }
+
+      // Filter di Vocab
+      const filteredVocab = vocabularyData.filter(item => 
+        item.term.toLowerCase().includes(keyword) ||
+        item.en.toLowerCase().includes(keyword) ||
+        item.def.toLowerCase().includes(keyword)
+      );
+
+      // Filter di Frasa
+      const filteredPhrases = phrasesData.filter(item => 
+        item.category.toLowerCase().includes(keyword) ||
+        item.idText.toLowerCase().includes(keyword) ||
+        item.enText.toLowerCase().includes(keyword)
+      );
+
+      // Filter di Dialog
+      const dialogCards = document.querySelectorAll('.dialogue-card');
+      let matchedDialogues = 0;
+      dialogCards.forEach(card => {
+        const text = (card.innerText + " " + (card.dataset.keywords || '')).toLowerCase();
+        if (text.includes(keyword)) {
+          card.style.display = 'block';
+          matchedDialogues++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      const totalMatches = filteredVocab.length + filteredPhrases.length + matchedDialogues;
+
+      if (totalMatches === 0) {
+        vocabSec.style.display = 'none';
+        phraseSec.style.display = 'none';
+        dialogSec.style.display = 'none';
+        noResult.style.display = 'block';
+      } else {
+        noResult.style.display = 'none';
+
+        // Jika ada hasil di vocab, tampilkan
+        if (filteredVocab.length > 0) {
+          vocabSec.style.display = 'block';
+          renderVocabularyGrouped(filteredVocab);
+        } else {
+          vocabSec.style.display = 'none';
+        }
+
+        // Jika ada hasil di frasa, tampilkan
+        if (filteredPhrases.length > 0) {
+          phraseSec.style.display = 'block';
+          renderPhrasesList(filteredPhrases);
+        } else {
+          phraseSec.style.display = 'none';
+        }
+
+        // Jika ada hasil di dialog, tampilkan
+        if (matchedDialogues > 0) {
+          dialogSec.style.display = 'block';
+        } else {
+          dialogSec.style.display = 'none';
+        }
+      }
+    }
+
+    window.onload = () => renderPage();
+  </script>
+</body>
+</html>

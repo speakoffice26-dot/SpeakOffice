@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Body Language & Gestures - SPEAKOFFICE</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/etiquette.css">
+</head>
+<body>
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="../index.html" class="brand-logo">
+        <img src="../assets/logobesar.png" alt="Logo SPEAKOFFICE" style="height: 48px; width: auto;">
+      </a>
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Beranda</a>
+        <a href="case-study.html" class="nav-link">Interactive Case Study</a>
+        <a href="phrasebook.html" class="nav-link">Phrasebook</a>
+        <a href="etiquette.html" class="nav-link active">Visual Etiquette</a>
+        <a href="about.html" class="nav-link">About Us</a>
+      </nav>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px; position: relative;">
+        <a href="teacher-dashboard.html" class="icon-btn" title="Mode Guru (Dashboard Pengajar)" style="text-decoration: none; font-size: 1.25rem; background: #FEF3C7; border: 1.5px solid #FCD34D; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%;">
+          👨‍🏫
+        </a>
+        <a href="phrasebook.html#searchInput" class="icon-btn" title="Cari Frasa Kantor" style="text-decoration: none; font-size: 1.2rem; background: var(--bg-soft-blue, #EFF6FF); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">🔍</a>
+        <a href="profile.html" class="icon-btn" title="Buka Profil Siswa" style="text-decoration: none; font-size: 1.2rem; background: var(--bg-soft-blue, #EFF6FF); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; position: relative;">
+          👤
+          <span style="position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background: #22c55e; border: 2px solid #fff; border-radius: 50%;"></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="etiquette-container">
+    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <a href="etiquette.html" style="font-size: 0.9rem; color: var(--color-royal); text-decoration: none; font-weight: 600;">&larr; Kembali ke Menu Etiket</a>
+        <h2 style="font-size: 2rem; color: var(--color-navy); margin-top: 6px;">🤝 Body Language & Gestures Carousel</h2>
+      </div>
+      <div id="slideCounter" style="font-weight: 700; color: var(--color-royal); background: var(--bg-soft-blue); padding: 6px 14px; border-radius: 99px; font-size: 0.9rem;">
+        Aturan 1 dari 4
+      </div>
+    </div>
+
+    <!-- CAROUSEL WRAPPER 2 KOLOM (TEKS & FOTO TANPA BINGKAI) -->
+    <div class="carousel-card-layout">
+      <!-- Sisi Kiri: Teks & Penjelasan -->
+      <div>
+        <span id="ruleTypeBadge" class="category-tag" style="margin-bottom: 12px;">Klien Eksekutif / Formal</span>
+        <h3 id="ruleTitle" style="color: var(--color-navy); font-size: 1.4rem; margin-bottom: 12px;">Kontak Mata & Jabat Tangan Tegas</h3>
+        <p id="ruleDesc" style="color: var(--text-secondary); font-size: 1.05rem; line-height: 1.6; margin-bottom: 24px;">
+          Saat berhadapan dengan klien VIP atau pimpinan eksekutif, berikan jabat tangan yang mantap (firm handshake) dan pertahankan kontak mata 60-70% untuk memancarkan kepercayaan diri.
+        </p>
+      </div>
+
+      <!-- Sisi Kanan: Foto Berbeda Tiap Slide Tanpa Bingkai -->
+      <div class="visual-display-box" style="background: transparent; border: none; box-shadow: none; padding: 0;">
+        <img id="ruleImage" src="../assets/kontakmata.jpeg" alt="Ilustrasi Body Language" style="width: 100%; max-height: 250px; object-fit: contain; border-radius: 12px; margin-bottom: 12px; display: block;">
+        <div id="ruleVisualCaption" style="font-weight: 700; color: var(--color-navy); font-size: 1rem;">Pendekatan Klien Eksekutif</div>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">Visualisasi Non-Verbal Profesional</p>
+      </div>
+    </div>
+
+    <!-- TOMBOL NAVIGASI CAROUSEL -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
+      <button onclick="prevRule()" id="prevBtn" class="btn-secondary" style="padding: 10px 20px; border-radius: 8px; border: 1px solid #CBD5E1; cursor: pointer; font-weight: 600;">
+        &larr; Sebelumnya
+      </button>
+      <div id="dotIndicators" style="display: flex; gap: 8px;"></div>
+      <button onclick="nextRule()" id="nextBtn" class="btn-primary" style="padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;">
+        Berikutnya &rarr;
+      </button>
+    </div>
+  </main>
+
+  <footer class="footer"><div class="container"><p><strong>SPEAKOFFICE</strong> &copy; 2026</p></div></footer>
+
+  <!-- SCRIPT CAROUSEL BODY LANGUAGE & GESTURES -->
+  <script>
+    const rulesData = [
+      {
+        type: "💼 Klien Eksekutif / Formal",
+        badgeBg: "#EFF6FF",
+        badgeColor: "#1D4ED8",
+        title: "Kontak Mata & Jabat Tangan Tegas",
+        desc: "Saat berhadapan dengan klien VIP atau pimpinan eksekutif, berikan jabat tangan yang mantap (firm handshake) dengan postur tubuh tegak untuk memancarkan kredibilitas institusi.",
+        image: "../assets/kontakmata.jpeg",
+        caption: "Pendekatan Klien Eksekutif"
+      },
+      {
+        type: "⚠️ Klien Komplain / Marah",
+        badgeBg: "#FEF2F2",
+        badgeColor: "#DC2626",
+        title: "Postur Terbuka & Empati Mendalam",
+        desc: "Saat menghadapi klien yang sedang marah atau komplain, hindari melipat tangan di dada. Gunakan postur tubuh terbuka (open posture) dan condongkan sedikit badan ke depan untuk menunjukkan empati.",
+        image: "../assets/marah.jpeg",
+        caption: "Manajemen Konflik & Empati"
+      },
+      {
+        type: "🤝 Sesi Negosiasi Bisnis",
+        badgeBg: "#F0FDF4",
+        badgeColor: "#059669",
+        title: "Anggukan Aktif & Kontrol Gestur",
+        desc: "Dalam proses negosiasi kontrak, berikan anggukan kepala secara berkala saat mitra berbicara guna menunjukkan bahwa Anda menyimak substansi pembahasan dengan cermat.",
+        image: "../assets/slide3.jpeg",
+        caption: "Gestur Negosiasi & Kemitraan"
+      },
+      {
+        type: "❌ Yang Harus Dihindari (Don'ts)",
+        badgeBg: "#FEF2F2",
+        badgeColor: "#DC2626",
+        title: "Bahasa Tubuh Defensif & Gelisah",
+        desc: "Hindari sering melirik jam tangan, memainkan pulpen secara gelisah (fidgeting), atau menghindari tatapan mata, karena hal tersebut mengisyaratkan ketidaktabahan atau ketidakjujuran.",
+        image: "../assets/panik.jpeg",
+        caption: "Hindari Gestur Gelisah / Defensif"
+      }
+    ];
+
+    let currentIndex = 0;
+
+    function renderRule(index) {
+      const data = rulesData[index];
+      document.getElementById('slideCounter').innerText = `Aturan ${index + 1} dari ${rulesData.length}`;
+      document.getElementById('ruleTypeBadge').innerText = data.type;
+      document.getElementById('ruleTypeBadge').style.background = data.badgeBg;
+      document.getElementById('ruleTypeBadge').style.color = data.badgeColor;
+      document.getElementById('ruleTitle').innerText = data.title;
+      document.getElementById('ruleDesc').innerText = data.desc;
+      document.getElementById('ruleImage').src = data.image;
+      document.getElementById('ruleVisualCaption').innerText = data.caption;
+
+      document.getElementById('prevBtn').style.opacity = index === 0 ? '0.5' : '1';
+      document.getElementById('prevBtn').style.pointerEvents = index === 0 ? 'none' : 'auto';
+      
+      const nextBtn = document.getElementById('nextBtn');
+      if (index === rulesData.length - 1) {
+        nextBtn.innerText = 'Kembali ke Menu 🏁';
+        nextBtn.style.background = '#059669';
+      } else {
+        nextBtn.innerText = 'Berikutnya →';
+        nextBtn.style.background = 'var(--color-primary, #2563EB)';
+      }
+
+      const dotsContainer = document.getElementById('dotIndicators');
+      dotsContainer.innerHTML = '';
+      rulesData.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.style.width = i === index ? '24px' : '8px';
+        dot.style.height = '8px';
+        dot.style.borderRadius = '4px';
+        dot.style.background = i === index ? '#2563EB' : '#CBD5E1';
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function nextRule() {
+      if (currentIndex < rulesData.length - 1) {
+        currentIndex++;
+        renderRule(currentIndex);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        window.location.href = 'etiquette.html';
+      }
+    }
+
+    function prevRule() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderRule(currentIndex);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    window.onload = () => renderRule(0);
+  </script>
+</body>
+</html>

@@ -1,0 +1,1162 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interactive Case Study & Business English - SPEAKOFFICE</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/case-study.css">
+  <style>
+    /* STYLING TAMBAHAN CASE STUDY INTERAKTIF & LOCKED ANSWER */
+    .category-tabs-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+    .cat-tab-btn {
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1.5px solid #CBD5E1;
+      background: #FFFFFF;
+      color: #334155;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .cat-tab-btn:hover {
+      border-color: #2563EB;
+      background: #F8FAFC;
+    }
+    .cat-tab-btn.active {
+      background: #2563EB;
+      color: #FFFFFF;
+      border-color: #2563EB;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
+    }
+
+    /* Opsi Jawaban Interaktif */
+    .option-card-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px 20px;
+      background: #FFFFFF;
+      border: 2px solid #E2E8F0;
+      border-radius: 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .option-card-item:hover:not(.locked) {
+      border-color: #2563EB;
+      background: #F0F7FF;
+      transform: translateX(4px);
+    }
+    .option-card-item.locked {
+      cursor: not-allowed;
+    }
+    .option-card-item.selected-correct {
+      border-color: #10B981 !important;
+      background: #ECFDF5 !important;
+    }
+    .option-card-item.selected-wrong {
+      border-color: #EF4444 !important;
+      background: #FEF2F2 !important;
+    }
+    .option-card-item.highlight-correct {
+      border-color: #10B981 !important;
+      background: #F0FDF4 !important;
+      border-style: dashed !important;
+    }
+
+    .opt-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: #0A1E5E;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1rem;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .selected-correct .opt-badge {
+      background: #10B981 !important;
+    }
+    .selected-wrong .opt-badge {
+      background: #EF4444 !important;
+    }
+    .highlight-correct .opt-badge {
+      background: #059669 !important;
+    }
+
+    /* Modal Akses Siswa Awal */
+    #studentSessionModal {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 10000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .session-modal-box {
+      background: #FFFFFF;
+      border-radius: 20px;
+      max-width: 440px;
+      width: 100%;
+      padding: 32px 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+      animation: zoomInModal 0.25s ease-out;
+    }
+    @keyframes zoomInModal {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* Student Badge Info di Atas Soal */
+    .active-student-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 10px 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+    }
+
+    /* Predikat Badge di Completion Screen */
+    .completion-score-badge {
+      font-size: 3.5rem;
+      font-weight: 900;
+      line-height: 1;
+      margin: 10px 0;
+    }
+    .badge-pill-result {
+      display: inline-block;
+      padding: 8px 24px;
+      border-radius: 99px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-bottom: 24px;
+    }
+    .pill-sangat-kompeten {
+      background: #DCFCE7;
+      color: #15803D;
+      border: 2px solid #86EFAC;
+    }
+    .pill-kompeten {
+      background: #EFF6FF;
+      color: #1D4ED8;
+      border: 2px solid #93C5FD;
+    }
+    .pill-perlu-latihan {
+      background: #FEF3C7;
+      color: #B45309;
+      border: 2px solid #FCD34D;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MODAL IDENTITAS SISWA (AKSES AWAL TANPA PASSWORD) -->
+  <div id="studentSessionModal">
+    <div class="session-modal-box">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <div style="width: 56px; height: 56px; border-radius: 50%; background: #EFF6FF; color: #2563EB; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
+          📝
+        </div>
+        <h3 style="font-size: 1.35rem; color: #0A1E5E; margin: 0 0 6px 0;">Identitas Peserta Didik</h3>
+        <p style="font-size: 0.85rem; color: #64748B; margin: 0; line-height: 1.5;">
+          Masukkan data diri Anda sebelum memulai pengerjaan studi kasus agar skor tercatat di dashboard guru.
+        </p>
+      </div>
+
+      <form onsubmit="handleSaveStudentSession(event)">
+        <div style="margin-bottom: 14px; text-align: left;">
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 5px;">
+            Nama Lengkap Siswa: <span style="color: #EF4444;">*</span>
+          </label>
+          <input type="text" id="modalInputName" class="form-input" placeholder="Contoh: Naura Thara" required style="width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1.5px solid #CBD5E1; border-radius: 10px;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin-bottom: 16px; text-align: left;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 5px;">
+              Kelas / Jurusan: <span style="color: #EF4444;">*</span>
+            </label>
+            <input type="text" id="modalInputClass" class="form-input" placeholder="Contoh: XI MP 1" required style="width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1.5px solid #CBD5E1; border-radius: 10px;">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 5px;">
+              No. Absen: <span style="color: #EF4444;">*</span>
+            </label>
+            <input type="number" id="modalInputAbsent" min="1" max="99" class="form-input" placeholder="01" required style="width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1.5px solid #CBD5E1; border-radius: 10px;">
+          </div>
+        </div>
+
+        <div style="margin-bottom: 24px; text-align: left;">
+          <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 5px;">
+            Asal SMK / Sekolah:
+          </label>
+          <input type="text" id="modalInputSchool" class="form-input" placeholder="Contoh: SMK Negeri 1 Jakarta" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1.5px solid #CBD5E1; border-radius: 10px;">
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 700;">
+          Mulai Uji Kompetensi Kasus 🚀
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOP NAVIGATION BAR -->
+  <header class="navbar">
+    <div class="container navbar-container">
+      <a href="../index.html" class="brand-logo" id="logoBtn">
+        <img src="../assets/logobesar.png" alt="Logo SPEAKOFFICE" style="height: 48px; width: auto;">
+      </a>
+      <nav class="nav-links">
+        <a href="../index.html" class="nav-link">Beranda</a>
+        <a href="case-study.html" class="nav-link active">Interactive Case Study</a>
+        <a href="phrasebook.html" class="nav-link">Phrasebook</a>
+        <a href="etiquette.html" class="nav-link">Visual Etiquette</a>
+        <a href="about.html" class="nav-link">About Us</a>
+      </nav>
+      <div class="nav-actions" style="display: flex; align-items: center; gap: 12px; position: relative;">
+        <a href="teacher-dashboard.html" class="icon-btn" title="Mode Guru (Dashboard Pengajar)" style="text-decoration: none; font-size: 1.25rem; background: #FEF3C7; border: 1.5px solid #FCD34D; display: flex; align-items: center; justify-content: center; width: 42px; height: 42px; border-radius: 50%;">
+          👨‍🏫
+        </a>
+        <a href="profile.html" class="icon-btn" title="Buka Profil Siswa" style="text-decoration: none; font-size: 1.2rem; background: var(--bg-soft-blue, #EFF6FF); width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 50%; cursor: pointer; position: relative;">
+          👤
+          <span style="position: absolute; top: 2px; right: 2px; width: 10px; height: 10px; background: #22c55e; border: 2px solid #fff; border-radius: 50%;"></span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- KONTEN UTAMA CASE STUDY -->
+  <main class="case-container">
+    <div style="margin-bottom: 20px;">
+      <span class="case-header-badge">Uji Kompetensi Administrasi Perkantoran & Business English</span>
+      <h2 style="font-size: 2rem; color: var(--color-navy); margin: 6px 0;">Interactive Case Study</h2>
+      <p style="color: var(--text-secondary); margin: 0;">
+        Pecahkan studi kasus situasi nyata dunia kerja perkantoran. Pilihlah respons paling tepat, profesional, dan beretika.
+      </p>
+    </div>
+
+    <!-- PENGELOMPOKAN KATEGORI SKENARIO -->
+    <div class="category-tabs-wrapper">
+      <button class="cat-tab-btn active" onclick="switchCategory('ALL')">
+        <span>🌟</span> Semua Kategori (15 Kasus)
+      </button>
+      <button class="cat-tab-btn" onclick="switchCategory('TAMU')">
+        <span>🏢</span> 1. Menerima Tamu & Janji Temu
+      </button>
+      <button class="cat-tab-btn" onclick="switchCategory('TELEPON')">
+        <span>📞</span> 2. Etika Telepon & Korespondensi
+      </button>
+      <button class="cat-tab-btn" onclick="switchCategory('PELAYANAN')">
+        <span>🤝</span> 3. Pelayanan Prima & Keluhan
+      </button>
+    </div>
+
+    <!-- BAR STATUS SISWA YANG SEDANG MENGERJAKAN -->
+    <div class="active-student-bar">
+      <div>
+        <span style="color: #64748B;">Peserta Didik:</span>
+        <strong id="barStudentName" style="color: #0A1E5E; margin-left: 4px;">Siswa</strong>
+        <span id="barStudentClass" style="background: #EFF6FF; color: #2563EB; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 8px; font-size: 0.8rem;">XI MP</span>
+      </div>
+      <div>
+        <button onclick="openStudentModal()" style="background: none; border: none; color: #2563EB; font-weight: 600; font-size: 0.8rem; cursor: pointer; text-decoration: underline;">
+          ✏️ Ubah Identitas
+        </button>
+      </div>
+    </div>
+
+    <!-- KARTU UTAMA SKENARIO / KUIS -->
+    <div id="quizCard" class="case-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+        <span id="scenarioTracker" style="font-weight: 700; color: var(--color-royal);">Skenario 1 dari 15</span>
+        <span id="scenarioCategory" style="background: var(--bg-soft-blue); color: var(--color-navy); padding: 4px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600;">Kategori: Menerima Tamu & Janji Temu</span>
+      </div>
+
+      <div class="case-grid-layout">
+        <div>
+          <h3 id="scenarioTitle" style="margin-bottom: 12px; color: var(--color-navy); font-size: 1.25rem;">Judul Skenario</h3>
+          <p id="scenarioDesc" style="color: var(--text-secondary); margin-bottom: 12px; line-height: 1.6; font-size: 0.95rem;">
+            Deskripsi kasus...
+          </p>
+        </div>
+
+        <!-- VIDEO CASE STUDY (casevid.mp4) -->
+        <div style="background: var(--bg-soft-blue); padding: 14px; border-radius: var(--radius-md); text-align: center;">
+          <div style="background: #FFFFFF; border: 1px solid #CBD5E1; border-radius: 12px; padding: 6px; margin-bottom: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: hidden;">
+            <video autoplay loop muted playsinline preload="auto" style="width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; display: block;">
+              <source src="../assets/casevid.mp4" type="video/mp4">
+              Browser kamu tidak mendukung pemutaran video.
+            </video>
+          </div>
+          <p style="font-weight: 700; color: var(--color-navy); font-size: 0.9rem; margin: 0;">Simulasi Administrasi Perkantoran</p>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 2px;">Critical Thinking & Problem Solving SMK</p>
+        </div>
+      </div>
+
+      <!-- KOTAK ATURAN SEKALI JAWAB (LOCKED ANSWER RULE) -->
+      <div style="margin-top: 24px; padding: 10px 14px; background: #F8FAFC; border-left: 4px solid #2563EB; border-radius: 6px; font-size: 0.85rem; color: #475569;">
+        🔒 <strong>Aturan Pengerjaan:</strong> Pilihlah salah satu opsi jawaban. Pilihan akan langsung terkunci (tidak dapat diubah) untuk menguji ketepatan analisis Anda secara objektif.
+      </div>
+
+      <!-- PILIHAN OPSI JAWABAN -->
+      <div style="margin-top: 20px;" id="optionsContainer">
+        <!-- Diisi otomatis via JavaScript -->
+      </div>
+
+      <!-- PANEL FEEDBACK INSTAN (MUNCUL OTOMATIS SETELAH SISWA MEMILIH OPSI) -->
+      <div id="instantFeedbackBox" style="display: none; border-radius: 14px; padding: 20px; margin-top: 24px; animation: fadeInFeedback 0.3s ease;">
+        <div style="display: flex; align-items: flex-start; gap: 14px; margin-bottom: 12px;">
+          <div id="feedbackIconBox" style="font-size: 2rem; line-height: 1;">🎯</div>
+          <div>
+            <h4 id="feedbackTitleText" style="font-size: 1.15rem; margin: 0 0 4px 0;">Jawaban Tepat!</h4>
+            <div id="feedbackSubtitleText" style="font-size: 0.85rem; font-weight: 700;">Standar Etika Komunikasi Terpenuhi</div>
+          </div>
+        </div>
+
+        <p id="feedbackDetailText" style="font-size: 0.92rem; line-height: 1.6; margin: 0 0 16px 0;">
+          Penjelasan mendalam...
+        </p>
+
+        <div style="display: flex; justify-content: flex-end;">
+          <button id="btnContinueNext" onclick="nextScenarioStep()" class="btn-primary" style="padding: 10px 24px; font-size: 0.95rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 700;">
+            Lanjut ke Soal Berikutnya &rarr;
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- KARTU HALAMAN SELESAI (COMPLETION SCREEN & SCORE EVALUATION) -->
+    <div id="completionCard" class="case-card" style="display: none; text-align: center; padding: 48px 32px;">
+      <div style="font-size: 3.8rem; margin-bottom: 12px;">🏆</div>
+      <h2 style="color: var(--color-navy); font-size: 2rem; margin-bottom: 6px;">Evaluasi Selesai! Hasil Uji Kompetensi</h2>
+      <p style="color: var(--text-secondary); max-width: 600px; margin: 0 auto 20px auto; font-size: 0.95rem;">
+        Berikut adalah evaluasi penilaian pengerjaan studi kasus administrasi dan komunikasi perkantoran Anda di <strong>SPEAKOFFICE</strong>.
+      </p>
+
+      <!-- SKOR ANGKA JELAS (0-100) -->
+      <div style="background: #F8FAFC; border: 1.5px solid #E2E8F0; border-radius: 20px; max-width: 480px; margin: 0 auto 28px auto; padding: 24px;">
+        <div style="font-size: 0.85rem; color: #64748B; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Skor Angka Akhir</div>
+        <div id="finalScoreDisplay" class="completion-score-badge" style="color: #2563EB;">85<span style="font-size: 1.8rem; color: #94A3B8;">/100</span></div>
+        <div id="finalPredicateBadge" class="badge-pill-result pill-sangat-kompeten">Sangat Kompeten</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; border-top: 1px solid #E2E8F0; padding-top: 16px; font-size: 0.85rem;">
+          <div>
+            <div style="color: #64748B;">Soal Dijawab</div>
+            <strong id="finalTotalQuestions" style="color: #0A1E5E; font-size: 1.1rem;">15</strong>
+          </div>
+          <div>
+            <div style="color: #15803D;">Jawaban Benar</div>
+            <strong id="finalCorrectCount" style="color: #15803D; font-size: 1.1rem;">13</strong>
+          </div>
+          <div>
+            <div style="color: #DC2626;">Jawaban Kurang Tepat</div>
+            <strong id="finalWrongCount" style="color: #DC2626; font-size: 1.1rem;">2</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- KETERANGAN PENYIMPANAN SISTEM -->
+      <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 12px; max-width: 480px; margin: 0 auto 28px auto; padding: 12px 16px; font-size: 0.85rem; color: #166534; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span>✅</span> Nilai & aktivitas Anda telah otomatis direkam ke Dashboard Pengajar.
+      </div>
+
+      <!-- TOMBOL TINDAKAN -->
+      <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+        <button onclick="restartCurrentQuiz()" class="btn-primary" style="padding: 12px 24px; font-size: 0.95rem; border: none; cursor: pointer; border-radius: 10px;">
+          🔄 Ulangi Skenario Ini
+        </button>
+        <a href="phrasebook.html" class="cat-tab-btn" style="text-decoration: none; padding: 12px 20px;">
+          📖 Buka Phrasebook Kantor
+        </a>
+        <a href="profile.html" class="cat-tab-btn" style="text-decoration: none; padding: 12px 20px;">
+          👤 Lihat Profil Siswa
+        </a>
+        <a href="teacher-dashboard.html" class="cat-tab-btn" style="text-decoration: none; padding: 12px 20px; background: #FEF3C7; color: #92400E; border-color: #FCD34D;">
+          🔒 Buka Rekap Dashboard Guru
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p><strong>SPEAKOFFICE</strong> &copy; 2026 - Speak Professionally, Serve Excellently</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT FIREBASE & LOGIKA CASE STUDY INTERAKTIF -->
+  <script src="../js/firebase-config.js"></script>
+  <script>
+    // =========================================================================
+    // MASTER DATA: 15 SKENARIO REALISTIS (3 KATEGORI RESMI)
+    // =========================================================================
+    const ALL_SCENARIOS = [
+      // -----------------------------------------------------------------------
+      // KATEGORI 1: MENERIMA TAMU & JANJI TEMU (FRONT OFFICE & APPOINTMENT)
+      // -----------------------------------------------------------------------
+      {
+        id: 1,
+        categoryTag: "TAMU",
+        categoryName: "Menerima Tamu & Janji Temu",
+        title: "Kasus 1: Tamu VIP Datang Mendadak Tanpa Janji Temu Saat Pimpinan Sedang Makan Siang & Rapat",
+        desc: "Seorang tamu penting (mitra bisnis/klien strategis) datang mendadak ke kantor tanpa janji temu (appointment) sebelumnya dan bersikeras ingin segera bertemu Pimpinan saat itu juga karena mengaku ada urusan mendesak. Pada saat bersamaan, Pimpinan sedang istirahat makan siang di luar kantor dan akan segera lanjut memimpin rapat koordinasi internal tertutup. Sebagai staf resepsionis/front office perkantoran, tindakan dan tutur kata apa yang paling santun dan profesional?",
+        options: [
+          {
+            key: "A",
+            text: "Menolak secara langsung dan berkata tegas: 'Pimpinan kami tidak mau diganggu saat istirahat makan siang dan rapat, silakan bapak datang lain kali saja.'",
+            correct: false,
+            feedbackTitle: "Kurang Tepat & Merusak Citra Lembaga!",
+            explanation: "Menolak tamu VIP dengan nada ketus dan tanpa empati mencoreng citra profesional instansi serta melanggar prinsip 3S (Senyum, Salam, Sapa) dan pelayanan prima (service excellence)."
+          },
+          {
+            key: "B",
+            text: "Terus-menerus menelpon ponsel pribadi pimpinan saat makan siang dan mempersilakan tamu tersebut langsung masuk menunggu di dalam ruang kerja pribadi pimpinan tanpa izin.",
+            correct: false,
+            feedbackTitle: "Pelanggaran Etika & Privasi Pimpinan!",
+            explanation: "Mengganggu pimpinan pada jam istirahat serta mengizinkan pihak eksternal masuk ke ruang kerja pimpinan tanpa izin berisiko terhadap kerahasiaan dokumen kantor dan melanggar SOP kesekretariatan."
+          },
+          {
+            key: "C",
+            text: "Menyambut ramah dengan senyum sopan, mempersilakan duduk di ruang tamu eksekutif, menyajikan air minum, menjelaskan secara santun bahwa pimpinan sedang ada agenda rapat di luar, mencatat keperluan di buku tamu, serta menawarkan penjadwalan ulang (reschedule) atau menghubungkan dengan wakil/divisi terkait jika mendesak.",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Service Excellence Front Office",
+            explanation: "Staf profesional selalu menjaga privasi & agenda pimpinan, memperlakukan tamu dengan rasa hormat tinggi, mendengarkan kebutuhan tamu, dan memberikan alternatif solusi yang elegan tanpa konfrontasi."
+          }
+        ]
+      },
+      {
+        id: 2,
+        categoryTag: "TAMU",
+        categoryName: "Menerima Tamu & Janji Temu",
+        title: "Kasus 2: Benturan Kepentingan & Gratifikasi Terselubung Tamu Vendor Tender",
+        desc: "Saat jam istirahat kantor, seorang tamu dari vendor peserta tender memberikan tas berisi gawai (gadget) terbaru kepada staf front office dengan dalih 'kenang-kenangan tali asih'. Pimpinan sedang dinas luar kota. Tindakan apa yang paling tepat sesuai kode etik perkantoran?",
+        options: [
+          {
+            key: "A",
+            text: "Menerima pemberian tersebut dan menyimpannya di laci meja staf karena merasa tidak meminta dan nilainya dianggap wajar.",
+            correct: false,
+            feedbackTitle: "Risiko Tindak Pidana Korupsi & Gratifikasi!",
+            explanation: "Menerima barang dari pihak yang memiliki hubungan kerja atau tender melanggar kode etik integritas dan dapat dikategorikan sebagai suap/gratifikasi ilegal."
+          },
+          {
+            key: "B",
+            text: "Menolak secara santun dan tegas berlandaskan kode etik instansi, serta membuat Berita Acara Penolakan Gratifikasi yang dilaporkan ke Unit Pengendalian Gratifikasi (UPG) selambat-lambatnya 1x24 jam.",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Integritas & Kepatuhan Hukum",
+            explanation: "Menolak pemberian dan mendokumentasikan penolakan secara resmi adalah standar kepatuhan tata kelola (Good Corporate Governance)."
+          },
+          {
+            key: "C",
+            text: "Meminta vendor tersebut menitipkan barangnya di pos satpam depan tanpa membuat catatan identitas dan berita acara penyerahan resmi.",
+            correct: false,
+            feedbackTitle: "Tindakan Mengaburkan Tanggung Jawab!",
+            explanation: "Menitipkan barang tanpa pencatatan resmi tetap berpotensi menjadi objek gratifikasi terselubung dan tidak akuntabel."
+          }
+        ]
+      },
+      {
+        id: 3,
+        categoryTag: "TAMU",
+        categoryName: "Menerima Tamu & Janji Temu",
+        title: "Kasus 3: Tamu Meminta Salinan Lembar Penilaian Kinerja (SKP) Tanpa Surat Tugas",
+        desc: "Seorang tamu mengaku sebagai auditor internal mendadak datang meminta salinan berkas lembar penilaian kinerja pegawai yang sedang dipromosikan, namun tamu tersebut tidak dapat menunjukkan surat tugas resmi tertulis.",
+        options: [
+          {
+            key: "A",
+            text: "Menolak memberikan dokumen fisik maupun digital secara langsung, menjelaskan ketentuan SOP bahwa data personal dilindungi, dan menyarankan pengajuan resmi melalui surat tugas.",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Pengamanan Informasi & Tata Naskah",
+            explanation: "Data personal dan arsip penilaian kinerja adalah dokumen terbatas. Penyerahan dokumen rahasia wajib berlandaskan surat tugas resmi."
+          },
+          {
+            key: "B",
+            text: "Langsung menyerahkan seluruh berkas karena yang meminta adalah pihak auditor internal yang memiliki fungsi pengawasan.",
+            correct: false,
+            feedbackTitle: "Pelanggaran Keamanan Informasi!",
+            explanation: "Tanpa surat tugas resmi, penyerahan berkas melanggar SOP keamanan informasi dan berisiko kebocoran data."
+          },
+          {
+            key: "C",
+            text: "Mengambil foto berkas menggunakan ponsel pribadi lalu mengirimkannya via WhatsApp demi mempercepat tugas auditor.",
+            correct: false,
+            feedbackTitle: "Pelanggaran Serius Kerahasiaan!",
+            explanation: "Menyebarkan dokumen personal melalui aplikasi pesan pribadi tanpa enkripsi institusional melanggar undang-undang perlindungan data."
+          }
+        ]
+      },
+      {
+        id: 4,
+        categoryTag: "TAMU",
+        categoryName: "Menerima Tamu & Janji Temu",
+        title: "Kasus 4: Tamu Warga Marah Karena Keterlambatan Izin dan Mengancam Memviralkan Instansi",
+        desc: "Seorang warga datang dengan emosi tinggi karena izin operasionalnya terlambat 3 hari dan mengancam memviralkan kantor di media sosial. Setelah dicek, dokumen tertahan karena kekurangan syarat formil dari pemohon sendiri.",
+        options: [
+          {
+            key: "A",
+            text: "Membalas dengan nada tegas dan menyalahkan warga karena tidak teliti membaca syarat dari awal.",
+            correct: false,
+            feedbackTitle: "Eskalasi Konflik & Non-Profesional!",
+            explanation: "Menyalahkan tamu secara konfrontatif memperkeruh suasana dan merusak citra pelayanan prima."
+          },
+          {
+            key: "B",
+            text: "Menenangkan tamu dengan empati di ruang konsultasi, menunjukkan rekam jejak digital berkas secara transparan, membantu melengkapi kekurangan formil, dan memberi estimasi waktu penyelesaian.",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! De-eskalasi & Pelayanan Prima",
+            explanation: "Komunikasi empatik dan transparansi berbasis data dapat meredakan emosi warga serta menyelesaikan masalah secara substantif."
+          },
+          {
+            key: "C",
+            text: "Langsung menandatangani izin tersebut secara tidak sah demi menghindari ancaman viral di internet.",
+            correct: false,
+            feedbackTitle: "Pelanggaran Hukum Administrasi!",
+            explanation: "Menerbitkan izin tanpa memenuhi syarat sah melanggar peraturan perundang-undangan."
+          }
+        ]
+      },
+      {
+        id: 5,
+        categoryTag: "TAMU",
+        categoryName: "Menerima Tamu & Janji Temu",
+        title: "Kasus 5: Tamu Asing Mitra Bisnis Datang Berkunjung (Front Office Business English)",
+        desc: "Seorang tamu eksekutif dari perusahaan mitra di Australia tiba di lobi resepsionis. Kalimat sapaan pembuka dalam bahasa Inggris manakah yang paling mencerminkan keramahan dan etika bisnis internasional?",
+        options: [
+          {
+            key: "A",
+            text: "'Good morning, Sir. Welcome to SpeakOffice. May I know your name and assist you with your appointment today?'",
+            correct: true,
+            feedbackTitle: "Excellent! International Business Standard",
+            explanation: "Sapaan formal, ucapan selamat datang, serta tawaran bantuan dengan bahasa yang sopan merupakan etika internasional resepsionis modern."
+          },
+          {
+            key: "B",
+            text: "'Hey there! Sit down on that chair, the boss is busy right now.'",
+            correct: false,
+            feedbackTitle: "Terlalu Kasual & Kurang Sopan!",
+            explanation: "Penggunaan 'Hey there' dan instruksi mendikte sangat tidak pantas untuk menyambut tamu bisnis resmi."
+          },
+          {
+            key: "C",
+            text: "'Wait here, who are you and why are you coming to our office?'",
+            correct: false,
+            feedbackTitle: "Nada Intimidatif & Kasar!",
+            explanation: "Pertanyaan bernada menginterogasi melanggar etika dasar penerimaan tamu."
+          }
+        ]
+      },
+
+      // -----------------------------------------------------------------------
+      // KATEGORI 2: ETIKA TELEPON & KORESPONDENSI BISNIS
+      // -----------------------------------------------------------------------
+      {
+        id: 6,
+        categoryTag: "TELEPON",
+        categoryName: "Etika Telepon & Korespondensi Bisnis",
+        title: "Kasus 6: Menerima Panggilan Bisnis Internasional & Menanyakan Identitas",
+        desc: "Telepon kantor berdering pada deringan kedua dari mitra asing yang ingin berbicara dengan Manajer Keuangan. Bagaimana standar respons telepon profesional dalam bahasa Inggris?",
+        options: [
+          {
+            key: "A",
+            text: "'Hello, Finance Department is not here, call back later afternoon, okay?'",
+            correct: false,
+            feedbackTitle: "Kurang Sopan & Terburu-buru!",
+            explanation: "Menolak telepon tanpa mencatat pesan dan tanpa sapaan resmi merusak reputasi instansi."
+          },
+          {
+            key: "B",
+            text: "'Good morning, SpeakOffice. This is Naura speaking. May I know who is calling, please, so I can direct your call properly?'",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Professional Telephone Etiquette",
+            explanation: "Menyebutkan salam waktu, nama perusahaan, identitas diri, serta menanyakan nama penelepon secara santun adalah standar baku komunikasi telepon."
+          },
+          {
+            key: "C",
+            text: "'Who is this? Why do you want to talk to our Finance Manager?'",
+            correct: false,
+            feedbackTitle: "Bernada Menginterogasi!",
+            explanation: "Pertanyaan 'Who is this?' terdengar kasar dan tidak sopan dalam etika bisnis."
+          }
+        ]
+      },
+      {
+        id: 7,
+        categoryTag: "TELEPON",
+        categoryName: "Etika Telepon & Korespondensi Bisnis",
+        title: "Kasus 7: Penulisan Subjek & Salam Pembuka Email Bisnis (Formal Correspondence)",
+        desc: "Anda ditugaskan mengirim email penawaran kemitraan strategis kepada Direktur Operasional perusahaan mitra di London. Format pembuka manakah yang paling tepat?",
+        options: [
+          {
+            key: "A",
+            text: "Subject: Formal Partnership Proposal / Salutation: 'Dear Mr. Richardson, I hope this email finds you well.'",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Business Email Excellence",
+            explanation: "Subjek email harus ringkas dan jelas, diikuti sapaan formal dengan nama keluarga (Dear Mr. [Last Name])."
+          },
+          {
+            key: "B",
+            text: "Subject: URGENT READ THIS! / Salutation: 'Hi Buddy, check our proposal file asap.'",
+            correct: false,
+            feedbackTitle: "Gaya Komunikasi Tidak Pantas!",
+            explanation: "Penggunaan huruf kapital penuh (shouting) dan sapaan kasual tidak pantas dalam surat bisnis institusional."
+          },
+          {
+            key: "C",
+            text: "Subject: (Kosong) / Salutation: 'Halo pak, ini lampiran proposal kami silahkan dibaca.'",
+            correct: false,
+            feedbackTitle: "Subjek Kosong & Kurang Profesional!",
+            explanation: "Mengirim email resmi tanpa subjek berisiko masuk ke folder spam dan mencerminkan kecerobohan administrasi."
+          }
+        ]
+      },
+      {
+        id: 8,
+        categoryTag: "TELEPON",
+        categoryName: "Etika Telepon & Korespondensi Bisnis",
+        title: "Kasus 8: Penolakan Tawaran Kontrak Mitra Secara Diplomatik (Business Negotiation)",
+        desc: "Mitra bisnis mengajukan revisi kontrak dengan tenggat waktu penyelesaian yang tidak realistis bagi tim Anda. Bagaimana respon penolakan diplomatik dalam Business English?",
+        options: [
+          {
+            key: "A",
+            text: "'Your proposed timeline is impossible and our team refuses to work on that crazy plan.'",
+            correct: false,
+            feedbackTitle: "Bernada Konfrontatif & Menghina!",
+            explanation: "Bahasa agresif dapat memutuskan hubungan diplomasi dan membatalkan kerja sama."
+          },
+          {
+            key: "B",
+            text: "'While we appreciate your initiative, due to our quality assurance standards, we would like to propose a revised timeline to guarantee optimal results.'",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Diplomatic Business Negotiation",
+            explanation: "Teknik 'agree & redirect' menghargai mitra terlebih dahulu, memberikan alasan objektif, lalu menawarkan solusi win-win."
+          },
+          {
+            key: "C",
+            text: "'Whatever, we will just send whatever is ready even if it has errors.'",
+            correct: false,
+            feedbackTitle: "Mengabaikan Kualitas & SOP!",
+            explanation: "Sikap pasrah dan menurunkan standar kualitas merugikan organisasi."
+          }
+        ]
+      },
+      {
+        id: 9,
+        categoryTag: "TELEPON",
+        categoryName: "Etika Telepon & Korespondensi Bisnis",
+        title: "Kasus 9: Distribusi Dokumen & Surat Berklasifikasi 'RAHASIA'",
+        desc: "Staf administrasi keliru mendistribusikan surat berklasifikasi 'RAHASIA' ke divisi umum dan sempat terbuka oleh staf magang. Apa langkah penanganan naskah dinas darurat?",
+        options: [
+          {
+            key: "A",
+            text: "Segera menarik fisik surat, membuat Berita Acara Insiden Keamanan Informasi kepada atasan, memberikan briefing kerahasiaan, dan memperketat buku ekspedisi tertutup.",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Incident Management Kearsipan",
+            explanation: "Penanganan kebocoran dokumen rahasia harus cepat, terdokumentasi dalam berita acara, dan dievaluasi pencegahannya."
+          },
+          {
+            key: "B",
+            text: "Membiarkan saja karena merasa staf magang tidak akan memahami arti isi dokumen penting tersebut.",
+            correct: false,
+            feedbackTitle: "Pengabaian Bahaya Kebocoran Informasi!",
+            explanation: "Mendiamkan insiden dokumen rahasia adalah pelanggaran berat kepatuhan kearsipan."
+          },
+          {
+            key: "C",
+            text: "Menyalahkan dan memarahi staf magang di depan pegawai lain agar mereka merasa takut.",
+            correct: false,
+            feedbackTitle: "Tindakan Emosional Tanpa Perbaikan Sistem!",
+            explanation: "Menyalahkan orang lain di depan publik tidak menyelesaikan akar kelemahan alur distribusi dokumen."
+          }
+        ]
+      },
+      {
+        id: 10,
+        categoryTag: "TELEPON",
+        categoryName: "Etika Telepon & Korespondensi Bisnis",
+        title: "Kasus 10: Membuka Rapat Koordinasi Daring Internasional (Meeting Facilitation)",
+        desc: "Sebagai sekretaris pimpinan, Anda bertugas memfasilitasi pembukaan sesi webinar/telekonferensi resmi bersama perwakilan direksi mancanegara. Kalimat manakah yang paling tepat?",
+        options: [
+          {
+            key: "A",
+            text: "'Good afternoon distinguished guests and participants. Welcome to our quarterly coordination meeting. Let us formally begin our agenda.'",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Professional Meeting Opening",
+            explanation: "Salam hormat kepada peserta penting, sambutan hangat, dan penegasan agenda mencerminkan etika kesekretariatan modern."
+          },
+          {
+            key: "B",
+            text: "'Hey everyone, let's start now so we can wrap this up fast.'",
+            correct: false,
+            feedbackTitle: "Terlalu Kasual & Kurang Formal!",
+            explanation: "Gaya bicara santai tidak pantas untuk rapat antar-pimpinan lintas negara."
+          },
+          {
+            key: "C",
+            text: "'Is anyone listening? Turn on your cameras now or we cancel the call.'",
+            correct: false,
+            feedbackTitle: "Bernada Mengancam & Kasar!",
+            explanation: "Etika fasilitator rapat harus senantiasa santun, suportif, dan menjaga kenyamanan peserta."
+          }
+        ]
+      },
+
+      // -----------------------------------------------------------------------
+      // KATEGORI 3: PELAYANAN PRIMA & PENANGANAN KELUHAN
+      // -----------------------------------------------------------------------
+      {
+        id: 11,
+        categoryTag: "PELAYANAN",
+        categoryName: "Pelayanan Prima & Penanganan Keluhan",
+        title: "Kasus 11: Bentrok Kritis Rapat Paripurna & Darurat Lapangan (Delegasi & Memo Kilat)",
+        desc: "Pada jam yang sama, Pimpinan dijadwalkan memimpin Rapat Paripurna bersama Dewan Pengawas, namun terjadi kerusakan jaringan data sentral di gedung yang memerlukan keputusan darurat. Bagaimana solusi administratifnya?",
+        options: [
+          {
+            key: "A",
+            text: "Membatalkan agenda Rapat Paripurna secara sepihak tanpa memberitahu Dewan Pengawas terlebih dahulu.",
+            correct: false,
+            feedbackTitle: "Kegagalan Manajemen Agenda Eksekutif!",
+            explanation: "Membatalkan rapat dewan secara sepihak merusak reputasi kepemimpinan organisasi."
+          },
+          {
+            key: "B",
+            text: "Mendelegasikan penanganan teknis kepada Kepala Divisi TI melalui disposisi darurat, menyiapkan Nota Dinas Kilat untuk ditandatangani pimpinan secara singkat, sehingga rapat utama tetap berjalan lancar.",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Delegasi & Kepemimpinan Administrasi",
+            explanation: "Prinsip delegasi wewenang dan pembuatan nota ringkas menjaga agenda strategis tetap berjalan tanpa mengabaikan keadaan darurat."
+          },
+          {
+            key: "C",
+            text: "Mengabaikan masalah kerusakan jaringan sampai rapat dewan selesai sore hari.",
+            correct: false,
+            feedbackTitle: "Pengabaian Risiko Operasional!",
+            explanation: "Membiarkan kelumpuhan fasilitas kantor mengganggu jalannya pelayanan publik."
+          }
+        ]
+      },
+      {
+        id: 12,
+        categoryTag: "PELAYANAN",
+        categoryName: "Pelayanan Prima & Penanganan Keluhan",
+        title: "Kasus 12: Penumpukan Arsip Inaktif Melewati Batas Jadwal Retensi Arsip (JRA)",
+        desc: "Gudang arsip kantor penuh dengan tumpukan dokumen keuangan 10 tahun lalu. Pimpinan meminta ruangan segera dikosongkan. Prosedur pemusnahan arsip manakah yang sesuai regulasi kearsipan?",
+        options: [
+          {
+            key: "A",
+            text: "Melakukan penilaian arsip bersama Panitia Penilai Arsip, mencocokkan masa simpan pada Jadwal Retensi Arsip (JRA), meminta persetujuan tertulis kepala lembaga/ANRI, dan menerbitkan Berita Acara Pemusnahan Arsip.",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Kepatuhan Regulasi Kearsipan",
+            explanation: "Pemusnahan arsip wajib memiliki legal standing (SK Tim, Berita Acara, dan daftar arsip musnah) demi akuntabilitas hukum."
+          },
+          {
+            key: "B",
+            text: "Langsung membakar tumpukan kertas tersebut di halaman belakang kantor pada sore hari.",
+            correct: false,
+            feedbackTitle: "Pelanggaran Pidana Kearsipan!",
+            explanation: "Memusnahkan arsip tanpa prosedur sah melanggar Undang-Undang Kearsipan No. 43 Tahun 2009."
+          },
+          {
+            key: "C",
+            text: "Menjual seluruh dokumen tersebut ke pengepul rongsokan untuk menambah kas operasional staf.",
+            correct: false,
+            feedbackTitle: "Pelanggaran Berat Kerahasiaan Negara!",
+            explanation: "Menjual dokumen kantor membocorkan rahasia negara/perusahaan kepada pihak yang tidak berhak."
+          }
+        ]
+      },
+      {
+        id: 13,
+        categoryTag: "PELAYANAN",
+        categoryName: "Pelayanan Prima & Penanganan Keluhan",
+        title: "Kasus 13: Permintaan Rekan Kerja Memalsukan Daftar Hadir Kehadiran",
+        desc: "Seorang rekan kerja yang datang terlambat meminta Anda membubuhkan tanda tangan titipan pada presensi daftar hadir apel pagi. Bagaimana sikap etika profesi yang harus diambil?",
+        options: [
+          {
+            key: "A",
+            text: "Menolak secara santun dan tegas dengan menjelaskan bahwa presensi adalah dokumen bukti akuntabilitas kinerja yang harus diisi secara jujur dan mandiri.",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Integritas & Disiplin Kerja",
+            explanation: "Integritas pegawai diukur dari kejujuran administrasi dasar. Menolak pemalsuan melindungi diri dan organisasi."
+          },
+          {
+            key: "B",
+            text: "Bersedia menandatanganinya demi menjaga solidaritas dan rasa setia kawan sesama staf.",
+            correct: false,
+            feedbackTitle: "Solidaritas yang Keliru & Pelanggaran Disiplin!",
+            explanation: "Memalsukan presensi merupakan pelanggaran disiplin kerja berat dan dapat dikenai sanksi administratif."
+          },
+          {
+            key: "C",
+            text: "Menandatanganinya dengan syarat rekan tersebut mentraktir makan siang di kantin.",
+            correct: false,
+            feedbackTitle: "Perilaku Koruptif!",
+            explanation: "Mencari keuntungan pribadi dari pelanggaran aturan mencerminkan degradasi moral kerja."
+          }
+        ]
+      },
+      {
+        id: 14,
+        categoryTag: "PELAYANAN",
+        categoryName: "Pelayanan Prima & Penanganan Keluhan",
+        title: "Kasus 14: Menangani Keluhan Keterlambatan Pengiriman Proyek Mitra Global (Handling Complaints)",
+        desc: "Klien asing menghubungi kantor dengan nada kesal karena laporan analitik terlambat diterima 2 hari. Bagaimana kalimat tanggapan keluhan dalam bahasa Inggris yang tepat?",
+        options: [
+          {
+            key: "A",
+            text: "'We sincerely apologize for the delay. We are finalizing the quality verification and will deliver the report by 3 PM today, along with our priority assistance.'",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Service Recovery & Empathy",
+            explanation: "Permintaan maaf yang tulus, kepastian waktu penyelesaian yang spesifik, dan komitmen kualitas adalah inti pemulihan layanan (service recovery)."
+          },
+          {
+            key: "B",
+            text: "'It is not my fault, the research division is very slow, you should call them directly.'",
+            correct: false,
+            feedbackTitle: "Melempar Tanggung Jawab!",
+            explanation: "Menyalahkan rekan kerja atau divisi lain di hadapan klien menunjukkan buruknya koordinasi internal."
+          },
+          {
+            key: "C",
+            text: "'Calm down, two days late is very normal in our country.'",
+            correct: false,
+            feedbackTitle: "Meremehkan Klien & Tidak Profesional!",
+            explanation: "Meremehkan keluhan klien menghancurkan kepercayaan mitra bisnis internasional."
+          }
+        ]
+      },
+      {
+        id: 15,
+        categoryTag: "PELAYANAN",
+        categoryName: "Pelayanan Prima & Penanganan Keluhan",
+        title: "Kasus 15: Mengonfirmasi Rincian Penjadwalan Rapat Eksekutif Lintas Zona Waktu",
+        desc: "Pimpinan meminta Anda mengatur jadwal pertemuan daring dengan perwakilan kantor di Tokyo dan London. Bagaimana kalimat konfirmasi waktu dalam korespondensi resmi?",
+        options: [
+          {
+            key: "A",
+            text: "'Please note that our meeting is scheduled for Thursday, Nov 26 at 2:00 PM WIB (GMT+7) / 4:00 PM JST / 7:00 AM GMT. Kindly confirm your availability.'",
+            correct: true,
+            feedbackTitle: "Sangat Tepat! Akurasi Manajemen Jadwal Global",
+            explanation: "Mencantumkan zona waktu secara eksplisit (WIB, JST, GMT) mencegah kesalahpahaman jadwal rapat lintas benua."
+          },
+          {
+            key: "B",
+            text: "'Let's meet tomorrow at 2 PM our time, adjust your own clocks over there.'",
+            correct: false,
+            feedbackTitle: "Kurang Jelas & Egois!",
+            explanation: "Tidak menyertakan konversi zona waktu berpotensi fatal menyebabkan rapat batal akibat selisih jam."
+          },
+          {
+            key: "C",
+            text: "'Join Zoom anytime tomorrow morning when you wake up.'",
+            correct: false,
+            feedbackTitle: "Sangat Ambigius & Tidak Sesuai Standar!",
+            explanation: "Agenda rapat bisnis memerlukan kepastian hari, tanggal, dan jam yang presisi."
+          }
+        ]
+      }
+    ];
+
+    // =========================================================================
+    // STATE VARIABEL & LOGIKA QUIZ
+    // =========================================================================
+    let currentCategory = "ALL";
+    let activeScenarios = [...ALL_SCENARIOS];
+    let currentIndex = 0;
+    let studentAnswers = []; // Menyimpan history jawaban siswa { scenarioId, selectedKey, isCorrect }
+    let isQuestionLocked = false;
+
+    // FUNGSI INISIALISASI SESI SISWA
+    function initStudentSession() {
+      const session = window.SpeakOfficeDB.getStudentSession();
+      if (!session.name || session.name === 'Siswa SpeakOffice') {
+        openStudentModal();
+      } else {
+        updateStudentBar(session.name, session.studentClass);
+      }
+    }
+
+    function openStudentModal() {
+      const session = window.SpeakOfficeDB.getStudentSession();
+      if (session.name && session.name !== 'Siswa SpeakOffice') {
+        document.getElementById('modalInputName').value = session.name;
+      }
+      if (session.studentClass) {
+        document.getElementById('modalInputClass').value = session.studentClass;
+      }
+      if (session.absent) {
+        document.getElementById('modalInputAbsent').value = session.absent;
+      }
+      if (session.school) {
+        document.getElementById('modalInputSchool').value = session.school;
+      }
+      document.getElementById('studentSessionModal').style.display = 'flex';
+    }
+
+    function handleSaveStudentSession(e) {
+      e.preventDefault();
+      const name = document.getElementById('modalInputName').value.trim();
+      const studentClass = document.getElementById('modalInputClass').value.trim();
+      const absent = document.getElementById('modalInputAbsent').value.trim();
+      const school = document.getElementById('modalInputSchool').value.trim();
+
+      window.SpeakOfficeDB.saveStudentSession({
+        name,
+        studentClass,
+        absent,
+        school: school || 'SMK Negeri 1 Jakarta'
+      });
+
+      updateStudentBar(name, studentClass);
+      document.getElementById('studentSessionModal').style.display = 'none';
+    }
+
+    function updateStudentBar(name, studentClass) {
+      document.getElementById('barStudentName').innerText = name || 'Siswa';
+      document.getElementById('barStudentClass').innerText = studentClass || 'SMK MP';
+    }
+
+    // FUNGSI GANTI KATEGORI
+    function switchCategory(cat) {
+      currentCategory = cat;
+      const btns = document.querySelectorAll('.cat-tab-btn');
+      btns.forEach(btn => btn.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+
+      if (cat === 'ALL') {
+        activeScenarios = [...ALL_SCENARIOS];
+      } else {
+        activeScenarios = ALL_SCENARIOS.filter(s => s.categoryTag === cat);
+      }
+
+      currentIndex = 0;
+      studentAnswers = [];
+      document.getElementById('quizCard').style.display = 'block';
+      document.getElementById('completionCard').style.display = 'none';
+      loadScenario(0);
+    }
+
+    // MEMUAT SKENARIO KE LAYAR
+    function loadScenario(index) {
+      if (index >= activeScenarios.length) {
+        showCompletionScreen();
+        return;
+      }
+
+      isQuestionLocked = false;
+      const item = activeScenarios[index];
+
+      // Update Teks Tracker & Kategori
+      document.getElementById('scenarioTracker').innerText = `Skenario ${index + 1} dari ${activeScenarios.length}`;
+      document.getElementById('scenarioCategory').innerText = `Kategori: ${item.categoryName}`;
+      document.getElementById('scenarioTitle').innerText = item.title;
+      document.getElementById('scenarioDesc').innerText = item.desc;
+
+      // Sembunyikan Kotak Feedback Instan
+      const feedbackBox = document.getElementById('instantFeedbackBox');
+      feedbackBox.style.display = 'none';
+
+      // Render Pilihan Jawaban
+      const container = document.getElementById('optionsContainer');
+      container.innerHTML = '';
+
+      item.options.forEach(opt => {
+        const optDiv = document.createElement('div');
+        optDiv.className = 'option-card-item';
+        optDiv.id = `option-${opt.key}`;
+        optDiv.onclick = () => selectOption(opt.key, opt.correct, opt.feedbackTitle, opt.explanation);
+
+        optDiv.innerHTML = `
+          <div class="opt-badge">${opt.key}</div>
+          <div style="flex: 1;">
+            <p style="font-weight: 600; color: #1E293B; margin: 0; line-height: 1.5; font-size: 0.95rem;">
+              ${opt.text}
+            </p>
+          </div>
+        `;
+        container.appendChild(optDiv);
+      });
+    }
+
+    // ATURAN SEKALI JAWAB (LOCKED ANSWER RULE)
+    function selectOption(chosenKey, isCorrect, title, explanation) {
+      if (isQuestionLocked) return; // Mencegah klik ganda jika sudah terkunci
+      isQuestionLocked = true;
+
+      const currentItem = activeScenarios[currentIndex];
+
+      // Rekam jawaban siswa
+      studentAnswers.push({
+        scenarioId: currentItem.id,
+        scenarioTitle: currentItem.title,
+        chosenKey,
+        isCorrect
+      });
+
+      // Kunci semua opsi agar tidak bisa diklik lagi
+      const allOptions = document.querySelectorAll('.option-card-item');
+      allOptions.forEach(opt => {
+        opt.classList.add('locked');
+      });
+
+      // Beri style warna pada jawaban yang dipilih
+      const chosenElement = document.getElementById(`option-${chosenKey}`);
+      if (isCorrect) {
+        chosenElement.classList.add('selected-correct');
+      } else {
+        chosenElement.classList.add('selected-wrong');
+        // Tandai opsi yang benar dengan highlight hijau lembut agar siswa belajar
+        const correctOpt = currentItem.options.find(o => o.correct);
+        if (correctOpt) {
+          const correctEl = document.getElementById(`option-${correctOpt.key}`);
+          if (correctEl) correctEl.classList.add('highlight-correct');
+        }
+      }
+
+      // Tampilkan Panel Feedback Instan di bawah opsi
+      const feedbackBox = document.getElementById('instantFeedbackBox');
+      const titleEl = document.getElementById('feedbackTitleText');
+      const subEl = document.getElementById('feedbackSubtitleText');
+      const detailEl = document.getElementById('feedbackDetailText');
+      const iconEl = document.getElementById('feedbackIconBox');
+      const nextBtn = document.getElementById('btnContinueNext');
+
+      if (isCorrect) {
+        feedbackBox.style.background = '#ECFDF5';
+        feedbackBox.style.border = '1.5px solid #10B981';
+        titleEl.style.color = '#065F46';
+        subEl.style.color = '#047857';
+        detailEl.style.color = '#064E3B';
+        iconEl.innerText = '🎯';
+        titleEl.innerText = title || 'Analisis Sangat Tepat!';
+        subEl.innerText = 'Standar Etika & Prosedur Administrasi Terpenuhi';
+      } else {
+        feedbackBox.style.background = '#FEF2F2';
+        feedbackBox.style.border = '1.5px solid #EF4444';
+        titleEl.style.color = '#991B1B';
+        subEl.style.color = '#B91C1C';
+        detailEl.style.color = '#7F1D1D';
+        iconEl.innerText = '⚠️';
+        titleEl.innerText = title || 'Tindakan Kurang Tepat!';
+        subEl.innerText = 'Terdapat Risiko Pelanggaran SOP / Etika Birokrasi';
+      }
+
+      detailEl.innerHTML = `<strong>Analisis Profesional:</strong> ${explanation}`;
+
+      // Ubah teks tombol jika sudah di soal terakhir
+      if (currentIndex === activeScenarios.length - 1) {
+        nextBtn.innerHTML = 'Lihat Hasil Evaluasi & Skor Akhir 🏆';
+      } else {
+        nextBtn.innerHTML = 'Lanjut ke Soal Berikutnya &rarr;';
+      }
+
+      feedbackBox.style.display = 'block';
+      feedbackBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function nextScenarioStep() {
+      currentIndex++;
+      if (currentIndex < activeScenarios.length) {
+        loadScenario(currentIndex);
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      } else {
+        showCompletionScreen();
+      }
+    }
+
+    // MENAMPILKAN HALAMAN EVALUASI & MENGIRIM SKOR KE DATABASE
+    function showCompletionScreen() {
+      document.getElementById('quizCard').style.display = 'none';
+      const completionCard = document.getElementById('completionCard');
+      completionCard.style.display = 'block';
+      window.scrollTo({ top: 100, behavior: 'smooth' });
+
+      const total = activeScenarios.length;
+      const correctCount = studentAnswers.filter(a => a.isCorrect).length;
+      const wrongCount = total - correctCount;
+      const score = Math.round((correctCount / total) * 100);
+
+      // Tentukan Predikat
+      let predicate = 'Perlu Latihan';
+      let badgeClass = 'pill-perlu-latihan';
+
+      if (score >= 85) {
+        predicate = 'Sangat Kompeten';
+        badgeClass = 'pill-sangat-kompeten';
+      } else if (score >= 75) {
+        predicate = 'Kompeten';
+        badgeClass = 'pill-kompeten';
+      }
+
+      // Update Tampilan DOM
+      document.getElementById('finalScoreDisplay').innerHTML = `${score}<span style="font-size: 1.8rem; color: #94A3B8;">/100</span>`;
+      const predBadge = document.getElementById('finalPredicateBadge');
+      predBadge.innerText = predicate;
+      predBadge.className = `badge-pill-result ${badgeClass}`;
+
+      document.getElementById('finalTotalQuestions').innerText = total;
+      document.getElementById('finalCorrectCount').innerText = correctCount;
+      document.getElementById('finalWrongCount').innerText = wrongCount;
+
+      // Ambil Sesi Siswa
+      const session = window.SpeakOfficeDB.getStudentSession();
+
+      // Kategori Skenario yang Dikerjakan
+      let categoryLabel = "Semua Kategori (Uji Komprehensif)";
+      if (currentCategory === 'TAMU') categoryLabel = "Menerima Tamu & Janji Temu";
+      else if (currentCategory === 'TELEPON') categoryLabel = "Etika Telepon & Korespondensi Bisnis";
+      else if (currentCategory === 'PELAYANAN') categoryLabel = "Pelayanan Prima & Penanganan Keluhan";
+
+      // OTOMATIS SIMPAN KE DATABASE AKTIVITAS (FIREBASE + LOCALSTORAGE)
+      window.SpeakOfficeDB.saveStudentActivity({
+        studentName: session.name || "Siswa SpeakOffice",
+        studentClass: session.studentClass || "XI MP",
+        studentAbsent: session.absent || "-",
+        category: categoryLabel,
+        score: score,
+        totalQuestions: total,
+        correctAnswers: correctCount,
+        predicate: predicate
+      }).then(res => {
+        console.log("Activity logged successfully:", res);
+      });
+    }
+
+    function restartCurrentQuiz() {
+      currentIndex = 0;
+      studentAnswers = [];
+      document.getElementById('quizCard').style.display = 'block';
+      document.getElementById('completionCard').style.display = 'none';
+      loadScenario(0);
+      window.scrollTo({ top: 120, behavior: 'smooth' });
+    }
+
+    // Inisialisasi saat window dimuat
+    window.onload = () => {
+      initStudentSession();
+      loadScenario(0);
+    };
+  </script>
+</body>
+</html>
