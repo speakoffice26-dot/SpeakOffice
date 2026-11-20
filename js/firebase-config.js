@@ -141,6 +141,44 @@ window.SpeakOfficeDB = {
       avatar: localStorage.getItem('speakoffice_student_avatar') || '👩‍💼'
     };
   },
+  /**
+   * Mencatat 1 kasus/soal (1..15) yang sudah dikerjakan siswa
+   */
+  recordAnsweredCase: function (caseId, meta = {}) {
+    if (!caseId) return this.getAnsweredCaseIds();
+    const key = 'speakoffice_answered_cases';
+    let map = {};
+    try {
+      const raw = localStorage.getItem(key);
+      map = raw ? JSON.parse(raw) : {};
+    } catch (e) {
+      map = {};
+    }
+
+    map[String(caseId)] = {
+      id: String(caseId),
+      categoryTag: meta.categoryTag || '',
+      categoryName: meta.categoryName || '',
+      correct: Boolean(meta.correct),
+      updatedAt: Date.now()
+    };
+
+    localStorage.setItem(key, JSON.stringify(map));
+    return Object.keys(map);
+  },
+
+  /**
+   * Mengambil daftar ID kasus unik yang sudah dikerjakan siswa
+   */
+  getAnsweredCaseIds: function () {
+    try {
+      const raw = localStorage.getItem('speakoffice_answered_cases');
+      const map = raw ? JSON.parse(raw) : {};
+      return Object.keys(map);
+    } catch (e) {
+      return [];
+    }
+  },
 
   /**
    * Menyimpan aktivitas pengerjaan kuis/studi kasus siswa
@@ -285,7 +323,7 @@ window.SpeakOfficeDB = {
       const raw = localStorage.getItem('speakoffice_activity_logs');
       let data = raw ? JSON.parse(raw) : [];
       if (classFilter && classFilter !== "all") {
-        data = data.filter(item => item.studentClass.toLowerCase() === classFilter.toLowerCase());
+        data = data.filter(item => (item.studentClass || '').toLowerCase() === classFilter.toLowerCase());
       }
       return data;
     } catch (e) {
@@ -299,12 +337,19 @@ window.SpeakOfficeDB = {
    */
   resetStudentProgress: function (keepProfile = true) {
     localStorage.removeItem('speakoffice_activity_logs');
+    localStorage.removeItem('speakoffice_answered_cases');
+    localStorage.removeItem('speakoffice_completed_categories');
+    localStorage.removeItem('speakoffice_logged_cat_TAMU');
+    localStorage.removeItem('speakoffice_logged_cat_TELEPON');
+    localStorage.removeItem('speakoffice_logged_cat_PELAYANAN');
     if (!keepProfile) {
       localStorage.removeItem('speakoffice_student_name');
       localStorage.removeItem('speakoffice_student_class');
       localStorage.removeItem('speakoffice_student_absent');
       localStorage.removeItem('speakoffice_student_school');
       localStorage.removeItem('speakoffice_student_avatar');
+      localStorage.removeItem('speakoffice_student_session');
+      localStorage.removeItem('speakoffice_read_attire');
     }
   },
 
@@ -316,9 +361,14 @@ window.SpeakOfficeDB = {
   },
 
   /**
-   * Menghapus seluruh data riwayat aktivitas (khusus reset oleh guru)
+- Menghapus seluruh data riwayat aktivitas & progres kasus siswa agar bisa dikerjakan ulang (khusus reset oleh guru)
    */
   resetActivities: function () {
     localStorage.removeItem('speakoffice_activity_logs');
+    localStorage.removeItem('speakoffice_answered_cases');
+    localStorage.removeItem('speakoffice_completed_categories');
+    localStorage.removeItem('speakoffice_logged_cat_TAMU');
+    localStorage.removeItem('speakoffice_logged_cat_TELEPON');
+    localStorage.removeItem('speakoffice_logged_cat_PELAYANAN');
   }
 };

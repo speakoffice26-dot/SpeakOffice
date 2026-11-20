@@ -429,6 +429,21 @@
       color: #1E293B;
       vertical-align: middle;
     }
+
+    /* Kunci total tombol reset untuk siswa; hanya tampil jika body punya class .teacher-unlocked */
+    #btnResetProfile,
+    #btnResetHistory,
+    .teacher-only-reset {
+      display: none !important;
+    }
+
+    body.teacher-unlocked #btnResetProfile {
+      display: flex !important;
+    }
+
+    body.teacher-unlocked #btnResetHistory {
+      display: inline-flex !important;
+    }
   </style>
 </head>
 <body>
@@ -626,13 +641,13 @@
           </div>
         </div>
 
-        <!-- TOMBOL EDIT DATA DIRI -->
+       <!-- TOMBOL EDIT DATA DIRI -->
         <button onclick="openEditModal()" class="btn-secondary" style="width: 100%; padding: 11px; border-radius: 10px; border: 1.5px solid #CBD5E1; cursor: pointer; font-weight: 600; font-size: 0.92rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
           <span>✏️</span> Ubah Data Diri & Absen
         </button>
 
         <!-- TOMBOL RESET PROGRES KE NOL -->
-        <button onclick="openResetModal()" style="width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1.5px solid #FECACA; background: #FEF2F2; color: #DC2626; cursor: pointer; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
+        <button id="btnResetProfile" class="teacher-only-reset" onclick="openResetModal()" style="display: none; width: 100%; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1.5px solid #FECACA; background: #FEF2F2; color: #DC2626; cursor: pointer; font-weight: 700; font-size: 0.85rem; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
           <span>🔄</span> Reset Progres (Mulai dari Nol)
         </button>
       </div>
@@ -676,7 +691,7 @@
 
     </div>
 
-    <!-- RIWAYAT PENGERJAAN & SKOR EVALUASI SISWA -->
+   <!-- RIWAYAT PENGERJAAN & SKOR EVALUASI SISWA -->
     <div class="history-card">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 8px;">
         <div>
@@ -688,7 +703,7 @@
           </p>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button onclick="openResetModal()" style="padding: 8px 14px; font-size: 0.82rem; border-radius: 8px; border: 1px solid #FECACA; background: #FEF2F2; color: #DC2626; font-weight: 700; cursor: pointer;">
+          <button id="btnResetHistory" class="teacher-only-reset" onclick="openResetModal()" style="display: none; padding: 8px 14px; font-size: 0.82rem; border-radius: 8px; border: 1px solid #FECACA; background: #FEF2F2; color: #DC2626; font-weight: 700; cursor: pointer;">
             🔄 Reset Riwayat
           </button>
           <a href="case-study.html" class="btn-primary" style="padding: 8px 16px; font-size: 0.85rem; border-radius: 8px; text-decoration: none;">
@@ -862,25 +877,38 @@
       const logs = window.SpeakOfficeDB.getStudentActivitiesSync();
       const totalActivities = logs.length;
 
-      if (totalActivities === 0) {
-        document.getElementById('statPoints').innerText = "⭐ 0/100";
-        document.getElementById('statCasesCount').innerText = "🏆 0 Selesai";
-      } else {
+      const answeredMapCheck = JSON.parse(localStorage.getItem('speakoffice_answered_cases') || '{}');
+      const answeredEntries = Object.values(answeredMapCheck);
+
+      if (totalActivities > 0) {
         const totalScore = logs.reduce((sum, item) => sum + (Number(item.score) || 0), 0);
         const avgScore = Math.round(totalScore / totalActivities);
         document.getElementById('statPoints').innerText = `⭐ ${avgScore}/100`;
         document.getElementById('statCasesCount').innerText = `🏆 ${totalActivities} Selesai`;
+      } else if (answeredEntries.length > 0) {
+        const correctAnswered = answeredEntries.filter(entry => entry && entry.correct === true).length;
+        const liveScore = Math.round((correctAnswered / answeredEntries.length) * 100);
+        document.getElementById('statPoints').innerText = `⭐ ${liveScore}/100`;
+        document.getElementById('statCasesCount').innerText = `🏆 ${answeredEntries.length} Kasus`;
+      } else {
+        document.getElementById('statPoints').innerText = "⭐ 0/100";
+        document.getElementById('statCasesCount').innerText = "🏆 0 Selesai";
       }
 
-      // 3. Kalkulasi Level Karier (15 Skenario Maksimal)
-      const completedCases = Math.min(totalActivities, 15);
+     // 3. Kalkulasi Level Karier (15 Skenario Maksimal)
+      const answeredMap = JSON.parse(localStorage.getItem('speakoffice_answered_cases') || '{}');
+      const uniqueAnsweredCount = Object.keys(answeredMap).length;
+
+      // Pakai jumlah kasus unik (1..15) jika tersedia; jika belum ada, fallback ke totalActivities
+      const rawCompleted = uniqueAnsweredCount > 0 ? uniqueAnsweredCount : totalActivities;
+      const completedCases = Math.min(rawCompleted, 15);
       const percent = Math.round((completedCases / 15) * 100);
 
       document.getElementById('progressBar').style.width = `${percent}%`;
       document.getElementById('percentText').innerText = `${percent}% Selesai`;
 
       let currentLevelNum = 1;
-      let currentLevelName = "Level 1: Siswa Trainee";
+      let currentLevelName = "Level 1: Siswa PKL / Trainee";
       let currentLevelIcon = "🥉";
 
       if (completedCases >= 12) {
@@ -908,28 +936,50 @@
 
       // Update Tombol Lanjutkan Kasus
       const btnContinue = document.getElementById('btnContinueCase');
-      if (completedCases === 0) {
-        btnContinue.innerHTML = "🚀 Mulai Skenario Kasus #1 &rarr;";
-      } else if (completedCases < 15) {
-        btnContinue.innerHTML = `Lanjutkan Skenario Kasus #${completedCases + 1} &rarr;`;
-      } else {
-        btnContinue.innerHTML = "🏆 Ulangi / Evaluasi Seluruh Skenario &rarr;";
+      if (btnContinue) {
+        if (completedCases === 0) {
+          btnContinue.innerHTML = "🚀 Mulai Skenario Kasus #1 &rarr;";
+          btnContinue.href = "case-study.html?case=1";
+        } else if (completedCases < 15) {
+          // Cari nomor skenario 1..15 pertama yang belum ada di answeredMap
+          let nextCaseId = null;
+          for (let i = 1; i <= 15; i++) {
+            const alreadyAnswered = Object.keys(answeredMap).some(key => {
+              const num = parseInt(String(key).match(/\d+/)?.[0], 10);
+              return num === i;
+            });
+            if (!alreadyAnswered) {
+              nextCaseId = i;
+              break;
+            }
+          }
+          if (!nextCaseId) {
+            nextCaseId = Math.min(completedCases + 1, 15);
+          }
+
+          btnContinue.innerHTML = `Lanjutkan Skenario Kasus #${nextCaseId} &rarr;`;
+          btnContinue.href = `case-study.html?case=${nextCaseId}`;
+        } else {
+          btnContinue.innerHTML = "🏆 Ulangi / Evaluasi Seluruh Skenario &rarr;";
+          btnContinue.href = "case-study.html?case=1";
+        }
       }
 
       // 4. Update Tabel Riwayat Aktivitas
       renderHistoryTable(logs);
 
-      // 5. Update Lencana Prestasi
+      // 5. Update Lencana Prestasi & Status Tombol Reset
       renderBadges(completedCases, logs);
+      updateTeacherResetVisibility();
     }
 
     // RENDER TAHAPAN LEVEL KARIER
     function renderCareerSteps(currentLevelNum) {
       const steps = [
-        { num: 1, icon: "🥉", title: "Level 1: Siswa PKL / Trainee", range: "(Kasus 1 - 3)" },
-        { num: 2, icon: "🥈", title: "Level 2: Junior Administrative Staff", range: "(Kasus 4 - 7)" },
-        { num: 3, icon: "🥇", title: "Level 3: Senior Office Specialist", range: "(Kasus 8 - 11)" },
-        { num: 4, icon: "👑", title: "Level 4: Professional Executive Manager", range: "(Kasus 12 - 15)" }
+        { num: 1, icon: "🥉", title: "Level 1: Siswa PKL / Trainee", range: "(1 - 3 Kasus)" },
+        { num: 2, icon: "🥈", title: "Level 2: Junior Administrative Staff", range: "(4 - 7 Kasus)" },
+        { num: 3, icon: "🥇", title: "Level 3: Senior Office Specialist", range: "(8 - 11 Kasus)" },
+        { num: 4, icon: "👑", title: "Level 4: Professional Executive Manager", range: "(12 - 15 Kasus)" }
       ];
 
       const container = document.getElementById('careerStepsContainer');
@@ -962,12 +1012,91 @@
       });
     }
 
+   // BANGUN DAFTAR RIWAYAT TERMASUK KATEGORI YANG SUDAH TUNTAS DARI JAWABAN KASUS
+    function buildHistoryListWithCategories(logs) {
+      const result = Array.isArray(logs) ? [...logs] : [];
+
+      let answeredMap = {};
+      try {
+        answeredMap = JSON.parse(localStorage.getItem('speakoffice_answered_cases') || '{}');
+      } catch (e) {
+        answeredMap = {};
+      }
+
+      const entriesById = new Map();
+      Object.entries(answeredMap).forEach(([key, val]) => {
+        const match = String(key).match(/\d+/);
+        const numId = match ? parseInt(match[0], 10) : NaN;
+        if (!isNaN(numId)) {
+          entriesById.set(numId, val || {});
+        }
+      });
+
+      const now = new Date();
+      const nowStr = now.getFullYear() + "-" +
+        String(now.getMonth() + 1).padStart(2, '0') + "-" +
+        String(now.getDate()).padStart(2, '0') + " " +
+        String(now.getHours()).padStart(2, '0') + ":" +
+        String(now.getMinutes()).padStart(2, '0') + ":" +
+        String(now.getSeconds()).padStart(2, '0');
+
+      const categories = [
+        { tag: "TAMU", label: "Menerima Tamu & Janji Temu", ids: [1, 2, 3, 4, 5] },
+        { tag: "TELEPON", label: "Etika Telepon & Korespondensi Bisnis", ids: [6, 7, 8, 9, 10] },
+        { tag: "PELAYANAN", label: "Pelayanan Prima & Penanganan Keluhan", ids: [11, 12, 13, 14, 15] }
+      ];
+
+      categories.forEach(cat => {
+        const isComplete = cat.ids.every(id => entriesById.has(id));
+        const alreadyInLogs = result.some(item =>
+          item && typeof item.category === 'string' &&
+          item.category.toLowerCase().includes(cat.label.toLowerCase())
+        );
+
+        if (isComplete && !alreadyInLogs) {
+          const correctCount = cat.ids.filter(id => entriesById.get(id)?.correct === true).length;
+          const score = Math.round((correctCount / cat.ids.length) * 100);
+          let predicate = "Perlu Latihan";
+          if (score >= 85) predicate = "Sangat Kompeten";
+          else if (score >= 75) predicate = "Kompeten";
+
+          result.push({
+            timestamp: result[0]?.timestamp || nowStr,
+            category: cat.label,
+            score: score,
+            predicate: predicate
+          });
+        }
+      });
+
+      // Jika belum ada log sama sekali tapi ada kasus yang sudah dijawab (misal baru jawab 1-4 soal), tampilkan ringkasan progresnya
+      if (result.length === 0 && entriesById.size > 0) {
+        const totalAns = entriesById.size;
+        const correctAns = Array.from(entriesById.values()).filter(v => v && v.correct === true).length;
+        const score = Math.round((correctAns / totalAns) * 100);
+        let predicate = "Perlu Latihan";
+        if (score >= 85) predicate = "Sangat Kompeten";
+        else if (score >= 75) predicate = "Kompeten";
+
+        result.push({
+          timestamp: nowStr,
+          category: `Progres Studi Kasus (${totalAns}/15 Soal Terjawab)`,
+          score: score,
+          predicate: predicate
+        });
+      }
+
+      return result;
+    }
+
     // RENDER TABEL RIWAYAT AKTIVITAS
     function renderHistoryTable(logs) {
       const tbody = document.getElementById('historyTableBody');
       tbody.innerHTML = '';
 
-      if (!logs || logs.length === 0) {
+      const displayLogs = buildHistoryListWithCategories(logs);
+
+      if (!displayLogs || displayLogs.length === 0) {
         tbody.innerHTML = `
           <tr>
             <td colspan="4" style="text-align: center; color: #64748B; padding: 36px 20px;">
@@ -985,17 +1114,18 @@
         return;
       }
 
-      // Tampilkan hingga 8 riwayat terbaru
-      const recent = logs.slice(0, 8);
+      // Tampilkan hingga 10 riwayat terbaru agar kategori hasil 15 soal ikut terlihat semua
+      const recent = displayLogs.slice(0, 10);
       recent.forEach(item => {
         const tr = document.createElement('tr');
-        
+        const numericScore = Number(item.score) || 0;
+
         let badgeColor = '#2563EB';
         let bgBadge = '#EFF6FF';
-        if (item.score >= 85) {
+        if (numericScore >= 85) {
           badgeColor = '#15803D';
           bgBadge = '#DCFCE7';
-        } else if (item.score < 75) {
+        } else if (numericScore < 75) {
           badgeColor = '#B45309';
           bgBadge = '#FEF3C7';
         }
@@ -1004,7 +1134,7 @@
           <td style="font-size: 0.8rem; color: #64748B; white-space: nowrap;">📅 ${item.timestamp || '-'}</td>
           <td style="font-weight: 600;">${item.category || 'Interactive Case Study'}</td>
           <td style="text-align: center; font-weight: 800; font-size: 1rem; color: ${badgeColor};">
-            ${item.score}/100
+            ${numericScore}/100
           </td>
           <td style="text-align: center;">
             <span style="background: ${bgBadge}; color: ${badgeColor}; font-weight: 700; font-size: 0.75rem; padding: 4px 10px; border-radius: 99px;">
@@ -1019,18 +1149,49 @@
        // RENDER LENCANA PRESTASI SECARA DINAMIS
     function renderBadges(completedCases, logs) {
       const container = document.getElementById('badgesGridContainer');
-      
-      // 1. Pemicu Badge Integritas (Kasus Tamu / Etika >= 75)
-      const hasIntegrity = logs.some(l => (l.category.includes('Tamu') || l.category.includes('Etika')) && l.score >= 75);
-      
-      // 2. Pemicu Badge Email Pro (Kasus Telepon / Korespondensi >= 75)
-      const hasEmail = logs.some(l => (l.category.includes('Telepon') || l.category.includes('Korespondensi')) && l.score >= 75);
-      
-      // 3. Pemicu Badge Etiket Busana (Kasus Pelayanan Prima / Grooming / Etiket >= 75 atau sudah baca modul)
-      const hasAttire = localStorage.getItem('speakoffice_read_attire') === 'true' || 
-                        logs.some(l => (l.category.includes('Pelayanan') || l.category.includes('Busana') || l.category.includes('Etiket')) && l.score >= 75);
-      
-      // 4. Pemicu Badge Master (15 Kasus Tuntas)
+      if (!container) return;
+
+      let completedCats = {};
+      try {
+        completedCats = JSON.parse(localStorage.getItem('speakoffice_completed_categories') || '{}');
+      } catch (e) {
+        completedCats = {};
+      }
+
+      let answeredMap = {};
+      try {
+        answeredMap = JSON.parse(localStorage.getItem('speakoffice_answered_cases') || '{}');
+      } catch (e) {
+        answeredMap = {};
+      }
+
+      const answeredIds = new Set(
+        Object.keys(answeredMap)
+          .map(k => parseInt(String(k).match(/\d+/)?.[0], 10))
+          .filter(n => !isNaN(n))
+      );
+
+      // 1. Pemicu Badge Integritas: kategori TAMU selesai atau kasus 1-4 sudah dijawab / skor log >= 75
+      const tamuDone = Boolean(completedCats.TAMU) || [1, 2, 3, 4].every(id => answeredIds.has(id));
+      const hasIntegrity = tamuDone || logs.some(l =>
+        ((l.category && (l.category.includes('Tamu') || l.category.includes('Etika') || l.category.includes('Semua Kategori'))) && Number(l.score) >= 75)
+      );
+
+      // 2. Pemicu Badge Email Pro: kategori TELEPON selesai atau kasus 6-10 sudah dijawab / skor log >= 75
+      const teleponDone = Boolean(completedCats.TELEPON) || [6, 7, 8, 9, 10].every(id => answeredIds.has(id));
+      const hasEmail = teleponDone || logs.some(l =>
+        ((l.category && (l.category.includes('Telepon') || l.category.includes('Korespondensi') || l.category.includes('Semua Kategori'))) && Number(l.score) >= 75)
+      );
+
+      // 3. Pemicu Badge Etiket Busana: sudah baca modul attire atau kategori PELAYANAN selesai / skor >= 75
+      const pelayananDone = Boolean(completedCats.PELAYANAN) || [11, 12, 13, 14, 15].every(id => answeredIds.has(id));
+      const hasAttire = localStorage.getItem('speakoffice_read_attire') === 'true' ||
+        pelayananDone ||
+        logs.some(l =>
+          ((l.category && (l.category.includes('Pelayanan') || l.category.includes('Busana') || l.category.includes('Etiket') || l.category.includes('Semua Kategori'))) && Number(l.score) >= 75)
+        );
+
+      // 4. Pemicu Badge Master: 15 kasus tuntas
       const hasMaster = completedCases >= 15;
 
       container.innerHTML = `
@@ -1042,7 +1203,7 @@
           <h4 style="color: #0A1E5E; font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Integritas & Anti-Suap</h4>
           <p style="font-size: 0.8rem; color: #64748B; line-height: 1.4;">Menolak gratifikasi vendor dan taat pada kode etik perkantoran.</p>
           <span style="display: inline-block; margin-top: 8px; font-size: 0.75rem; background: ${hasIntegrity ? '#DCFCE7' : '#F1F5F9'}; color: ${hasIntegrity ? '#16A34A' : '#64748B'}; font-weight: 700; padding: 2px 10px; border-radius: 99px;">
-            ${hasIntegrity ? 'Tercapai ✓' : 'Belum Terbuka 🔒'}
+            ${hasIntegrity ? '✓ Tercapai' : 'Belum Terbuka 🔒'}
           </span>
         </div>
 
@@ -1054,11 +1215,11 @@
           <h4 style="color: #0A1E5E; font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Business Email Pro</h4>
           <p style="font-size: 0.8rem; color: #64748B; line-height: 1.4;">Menyusun surat & email komunikasi bisnis dalam bahasa Inggris.</p>
           <span style="display: inline-block; margin-top: 8px; font-size: 0.75rem; background: ${hasEmail ? '#DCFCE7' : '#F1F5F9'}; color: ${hasEmail ? '#16A34A' : '#64748B'}; font-weight: 700; padding: 2px 10px; border-radius: 99px;">
-            ${hasEmail ? 'Tercapai ✓' : 'Belum Terbuka 🔒'}
+            ${hasEmail ? '✓ Tercapai' : 'Belum Terbuka 🔒'}
           </span>
         </div>
 
-        <!-- Badge 3: Etiket Busana Formal (SEKARANG SUDAH DINAMIS & BISA TERKUNCI) -->
+        <!-- Badge 3: Etiket Busana Formal -->
         <div class="badge-card" style="${hasAttire ? '' : 'opacity: 0.65;'}">
           <div class="badge-icon-box" style="background: ${hasAttire ? '#FDF4FF' : '#F1F5F9'}; color: ${hasAttire ? '#9333EA' : '#94A3B8'};">
             👔
@@ -1066,7 +1227,7 @@
           <h4 style="color: #0A1E5E; font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Etiket Busana Formal</h4>
           <p style="font-size: 0.8rem; color: #64748B; line-height: 1.4;">Memahami aturan Do's & Don'ts pakaian resmi dunia kerja.</p>
           <span style="display: inline-block; margin-top: 8px; font-size: 0.75rem; background: ${hasAttire ? '#DCFCE7' : '#F1F5F9'}; color: ${hasAttire ? '#16A34A' : '#64748B'}; font-weight: 700; padding: 2px 10px; border-radius: 99px;">
-            ${hasAttire ? 'Tercapai ✓' : 'Belum Terbuka 🔒'}
+            ${hasAttire ? '✓ Tercapai' : 'Belum Terbuka 🔒'}
           </span>
         </div>
 
@@ -1078,35 +1239,58 @@
           <h4 style="color: #0A1E5E; font-size: 1rem; font-weight: 700; margin-bottom: 4px;">Master of Service</h4>
           <p style="font-size: 0.8rem; color: #64748B; line-height: 1.4;">Selesaikan seluruh 15 skenario studi kasus perkantoran.</p>
           <span style="display: inline-block; margin-top: 8px; font-size: 0.75rem; background: ${hasMaster ? '#FEF3C7' : '#F1F5F9'}; color: ${hasMaster ? '#B45309' : '#64748B'}; font-weight: 600; padding: 2px 10px; border-radius: 99px;">
-            ${hasMaster ? 'Tercapai ✓ (Master)' : `Progres ${completedCases}/15`}
+            ${hasMaster ? '✓ Tercapai (Master)' : `Progres ${completedCases}/15`}
           </span>
         </div>
       `;
     }
 
+   // =========================================================================
+    // MODAL RESET PROGRES (KHUSUS GURU TERAUTENTIKASI)
     // =========================================================================
-    // MODAL RESET PROGRES
-    // =========================================================================
-        function openStudentModal() {
-      const session = window.SpeakOfficeDB.getStudentSession();
-      if (session.name && session.name !== 'Siswa SpeakOffice') {
-        document.getElementById('modalInputName').value = session.name;
+    function openResetModal() {
+      updateTeacherResetVisibility();
+      if (!isTeacherAuthenticated()) {
+        closeResetModal();
+        showToastNotification("Akses Ditolak", "Hanya Guru yang berwenang mereset nilai & progres siswa.");
+        return false;
       }
-      if (session.studentClass) {
-        document.getElementById('modalInputClass').value = session.studentClass;
-      }
-      if (session.absent) {
-        document.getElementById('modalInputAbsent').value = session.absent;
-      }
-      if (session.school) {
-        document.getElementById('modalInputSchool').value = session.school;
-      }
-      document.getElementById('studentSessionModal').style.display = 'flex';
+      document.getElementById('resetProgressModal').style.display = 'flex';
     }
 
-    // TAMBAHKAN FUNGSI INI DI SINI:
-    function closeStudentModal() {
-      document.getElementById('studentSessionModal').style.display = 'none';
+    function closeResetModal() {
+      document.getElementById('resetProgressModal').style.display = 'none';
+    }
+
+    function executeResetProgress(keepProfile) {
+      updateTeacherResetVisibility();
+      if (!isTeacherAuthenticated()) {
+        closeResetModal();
+        showToastNotification("Akses Ditolak", "Hanya Guru yang berwenang mereset data siswa.");
+        return false;
+      }
+      if (typeof window.SpeakOfficeDB?.resetStudentProgress === 'function') {
+        window.SpeakOfficeDB.resetStudentProgress(keepProfile);
+      } else {
+        localStorage.removeItem('speakoffice_activity_logs');
+        localStorage.removeItem('speakoffice_answered_cases');
+        if (!keepProfile) {
+          localStorage.removeItem('speakoffice_student_name');
+          localStorage.removeItem('speakoffice_student_class');
+          localStorage.removeItem('speakoffice_student_absent');
+          localStorage.removeItem('speakoffice_student_school');
+          localStorage.removeItem('speakoffice_student_avatar');
+        }
+      }
+
+      closeResetModal();
+      loadSavedProfile();
+      showToastNotification(
+        keepProfile ? "Progres Direset!" : "Reset Total Selesai",
+        keepProfile
+          ? "Skor & level kembali ke Level 1; data diri tetap tersimpan."
+          : "Seluruh data siswa dikembalikan ke kondisi awal."
+      );
     }
 
     // =========================================================================
@@ -1199,7 +1383,35 @@
       }
     }
 
-    window.onload = loadSavedProfile;
+    function isTeacherAuthenticated() {
+      return sessionStorage.getItem('speakoffice_teacher_auth') === 'true';
+    }
+
+    function updateTeacherResetVisibility() {
+      const allowed = isTeacherAuthenticated();
+      document.body.classList.toggle('teacher-unlocked', allowed);
+
+      const btnProfile = document.getElementById('btnResetProfile');
+      const btnHistory = document.getElementById('btnResetHistory');
+
+      if (btnProfile) {
+        btnProfile.style.setProperty('display', allowed ? 'flex' : 'none', 'important');
+        btnProfile.hidden = !allowed;
+      }
+      if (btnHistory) {
+        btnHistory.style.setProperty('display', allowed ? 'inline-flex' : 'none', 'important');
+        btnHistory.hidden = !allowed;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', updateTeacherResetVisibility);
+    window.addEventListener('pageshow', updateTeacherResetVisibility);
+    window.addEventListener('focus', updateTeacherResetVisibility);
+
+    window.onload = () => {
+      loadSavedProfile();
+      updateTeacherResetVisibility();
+    };
   </script>
 </body>
 </html>

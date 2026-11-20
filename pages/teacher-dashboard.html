@@ -723,9 +723,68 @@
       }, 3500);
     }
 
-    // MEMUAT DATA DARI SPEAKOFFICE DB
+    // MEMUAT DATA DARI SPEAKOFFICE DB (+ FALLBACK DARI JAWABAN KASUS TERJAWAB)
     function loadDashboardData() {
-      currentLogs = window.SpeakOfficeDB.getStudentActivitiesSync();
+      const logs = window.SpeakOfficeDB.getStudentActivitiesSync();
+
+      if (Array.isArray(logs) && logs.length > 0) {
+        currentLogs = logs;
+      } else {
+        let answeredMap = {};
+        try {
+          answeredMap = JSON.parse(localStorage.getItem('speakoffice_answered_cases') || '{}');
+        } catch (e) {
+          answeredMap = {};
+        }
+
+        const answeredIds = new Set(
+          Object.keys(answeredMap)
+            .map(k => parseInt(String(k).match(/\d+/)?.[0], 10))
+            .filter(n => !isNaN(n))
+        );
+
+        const session = typeof window.SpeakOfficeDB.getStudentSession === 'function'
+          ? window.SpeakOfficeDB.getStudentSession()
+          : {};
+
+        const now = new Date();
+        const nowStr = now.getFullYear() + "-" +
+          String(now.getMonth() + 1).padStart(2, '0') + "-" +
+          String(now.getDate()).padStart(2, '0') + " " +
+          String(now.getHours()).padStart(2, '0') + ":" +
+          String(now.getMinutes()).padStart(2, '0') + ":" +
+          String(now.getSeconds()).padStart(2, '0');
+
+        const categoryDefs = [
+          { name: "Menerima Tamu & Janji Temu", ids: [1, 2, 3, 4, 5] },
+          { name: "Etika Telepon & Korespondensi Bisnis", ids: [6, 7, 8, 9, 10] },
+          { name: "Pelayanan Prima & Penanganan Keluhan", ids: [11, 12, 13, 14, 15] }
+        ];
+
+        const generatedRows = [];
+        categoryDefs.forEach(cat => {
+          const answeredInCat = cat.ids.filter(id => answeredIds.has(id));
+          if (answeredInCat.length === 0) return;
+
+          const correctInCat = answeredInCat.filter(id => answeredMap[String(id)]?.correct === true).length;
+          const score = Math.round((correctInCat / answeredInCat.length) * 100);
+          const predicate = score >= 85 ? "Sangat Kompeten" : score >= 75 ? "Kompeten" : "Perlu Latihan";
+          const isComplete = answeredInCat.length === cat.ids.length;
+
+          generatedRows.push({
+            timestamp: nowStr,
+            studentName: session.name || "Siswa SpeakOffice",
+            studentClass: session.studentClass || "XI MP 1",
+            studentAbsent: session.absent || "-",
+            category: isComplete ? cat.name : `${cat.name} (${answeredInCat.length}/${cat.ids.length} Soal)`,
+            score: score,
+            predicate: predicate
+          });
+        });
+
+        currentLogs = generatedRows;
+      }
+
       applyFilters();
     }
 
@@ -737,11 +796,11 @@
 
       let filtered = currentLogs.filter(item => {
         // Filter Kelas
-        if (classVal !== 'all' && item.studentClass.toLowerCase() !== classVal.toLowerCase()) {
+        if (classVal !== 'all' && (item.studentClass || '').toLowerCase() !== classVal.toLowerCase()) {
           return false;
         }
         // Filter Kategori
-        if (catVal !== 'all' && item.category !== catVal) {
+        if (catVal !== 'all' && !(item.category || '').toLowerCase().includes(catVal.toLowerCase())) {
           return false;
         }
         // Search Nama / Absen
@@ -834,8 +893,8 @@
       const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
 
       const currentFiltered = currentLogs.filter(item => {
-        if (classVal !== 'all' && item.studentClass.toLowerCase() !== classVal.toLowerCase()) return false;
-        if (catVal !== 'all' && item.category !== catVal) return false;
+        if (classVal !== 'all' && (item.studentClass || '').toLowerCase() !== classVal.toLowerCase()) return false;
+        if (catVal !== 'all' && !(item.category || '').toLowerCase().includes(catVal.toLowerCase())) return false;
         if (searchVal) {
           const matchName = (item.studentName || '').toLowerCase().includes(searchVal);
           const matchAbsent = (item.studentAbsent || '').toString().toLowerCase().includes(searchVal);
@@ -858,13 +917,25 @@
       showToast("Data Diperbarui", "Tabel aktivitas siswa telah diperbarui.", "🔄");
     }
 
-    // RESET DATA
+    // RESET DATA (MENGHAPUS REKAP GURU SEKALIGUS PROGRES KASUS SISWA AGAR BISA DIULANG)
     function confirmResetData() {
-      const isConfirm = window.confirm("Apakah Anda yakin ingin mereset seluruh data riwayat siswa di SpeakOffice?");
+      const isConfirm = window.confirm(
+        "Apakah Anda yakin ingin mereset seluruh nilai dan progres kasus siswa? Data di sisi siswa juga akan ikut ke-reset sehingga siswa bisa mengerjakan ulang."
+      );
       if (isConfirm) {
-        window.SpeakOfficeDB.resetActivities();
-        loadDashboardData();
-        showToast("Data Direset", "Seluruh data riwayat aktivitas telah dibersihkan.", "🗑️");
+        if (window.SpeakOfficeDB && typeof window.SpeakOfficeDB.resetActivities === 'function') {
+          window.SpeakOfficeDB.resetActivities();
+        }
+        localStorage.removeItem('speakoffice_activity_logs');
+        localStorage.removeItem('speakoffice_answered_cases');
+        localStorage.removeItem('speakoffice_completed_categories');
+        localStorage.removeItem('speakoffice_logged_cat_TAMU');
+        localStorage.removeItem('speakoffice_logged_cat_TELEPON');
+        localStorage.removeItem('speakoffice_logged_cat_PELAYANAN');
+
+        currentLogs = [];
+        applyFilters();
+        showToast("Data Siswa Direset", "Nilai & progres siswa telah di-reset. Siswa dapat mengerjakan ulang.", "🗑️");
       }
     }
 

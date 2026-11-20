@@ -208,20 +208,25 @@
           </div>
         </div>
 
-        <div style="margin-bottom: 24px; text-align: left;">
+       <div style="margin-bottom: 24px; text-align: left;">
           <label style="display: block; font-size: 0.8rem; font-weight: 700; color: #334155; margin-bottom: 5px;">
             Asal SMK / Sekolah:
           </label>
           <input type="text" id="modalInputSchool" class="form-input" placeholder="Contoh: SMK Negeri 1 Jakarta" style="width: 100%; box-sizing: border-box; padding: 10px 14px; border: 1.5px solid #CBD5E1; border-radius: 10px;">
         </div>
 
-        <button type="submit" class="btn-primary" style="width: 100%; padding: 12px; font-size: 0.95rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 700;">
-          Mulai Uji Kompetensi Kasus 🚀
-        </button>
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button type="button" onclick="cancelStudentSession()" style="flex: 1; padding: 12px 14px; font-size: 0.92rem; border-radius: 10px; border: 1.5px solid #CBD5E1; background: #F1F5F9; color: #475569; cursor: pointer; font-weight: 700;">
+            &larr; Kembali
+          </button>
+          <button type="submit" class="btn-primary" style="flex: 1.4; padding: 12px 16px; font-size: 0.95rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 700;">
+            Mulai Uji Kompetensi Kasus 🚀
+          </button>
+        </div>
       </form>
     </div>
   </div>
-
+  
   <!-- TOP NAVIGATION BAR -->
   <header class="navbar">
     <div class="container navbar-container">
@@ -937,12 +942,23 @@
       document.getElementById('barStudentClass').innerText = studentClass || 'SMK MP';
     }
 
+    function cancelStudentSession() {
+      document.getElementById('studentSessionModal').style.display = 'none';
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = '../index.html';
+      }
+    }
+
     // FUNGSI GANTI KATEGORI
     function switchCategory(cat) {
       currentCategory = cat;
       const btns = document.querySelectorAll('.cat-tab-btn');
-      btns.forEach(btn => btn.classList.remove('active'));
-      event.currentTarget.classList.add('active');
+      const indexMap = { ALL: 0, TAMU: 1, TELEPON: 2, PELAYANAN: 3 };
+      btns.forEach((btn, idx) => {
+        btn.classList.toggle('active', idx === (indexMap[cat] ?? 0));
+      });
 
       if (cat === 'ALL') {
         activeScenarios = [...ALL_SCENARIOS];
@@ -1013,6 +1029,15 @@
         chosenKey,
         isCorrect
       });
+
+      // Catat ID kasus unik (1..15) ke SpeakOfficeDB agar progres & level di profil naik
+      if (window.SpeakOfficeDB && typeof window.SpeakOfficeDB.recordAnsweredCase === 'function') {
+        window.SpeakOfficeDB.recordAnsweredCase(currentItem.id, {
+          categoryTag: currentItem.categoryTag,
+          categoryName: currentItem.categoryName,
+          correct: Boolean(isCorrect)
+        });
+      }
 
       // Kunci semua opsi agar tidak bisa diklik lagi
       const allOptions = document.querySelectorAll('.option-card-item');
@@ -1128,6 +1153,10 @@
       else if (currentCategory === 'TELEPON') categoryLabel = "Etika Telepon & Korespondensi Bisnis";
       else if (currentCategory === 'PELAYANAN') categoryLabel = "Pelayanan Prima & Penanganan Keluhan";
 
+      const answeredIds = window.SpeakOfficeDB && typeof window.SpeakOfficeDB.getAnsweredCaseIds === 'function'
+        ? window.SpeakOfficeDB.getAnsweredCaseIds()
+        : studentAnswers.map(a => String(a.scenarioId));
+
       // OTOMATIS SIMPAN KE DATABASE AKTIVITAS (FIREBASE + LOCALSTORAGE)
       window.SpeakOfficeDB.saveStudentActivity({
         studentName: session.name || "Siswa SpeakOffice",
@@ -1137,7 +1166,8 @@
         score: score,
         totalQuestions: total,
         correctAnswers: correctCount,
-        predicate: predicate
+        predicate: predicate,
+        answeredIds: answeredIds
       }).then(res => {
         console.log("Activity logged successfully:", res);
       });
@@ -1152,11 +1182,30 @@
       window.scrollTo({ top: 120, behavior: 'smooth' });
     }
 
-    // Inisialisasi saat window dimuat
+  // Inisialisasi saat window dimuat
     window.onload = () => {
-      initStudentSession();
-      loadScenario(0);
+      try {
+        initStudentSession();
+      } catch (err) {
+        console.warn("Session init warning:", err);
+      }
+
+      const params = new URLSearchParams(window.location.search);
+      const requestedCase = parseInt(params.get('case'), 10);
+
+      if (!isNaN(requestedCase) && requestedCase >= 1 && requestedCase <= ALL_SCENARIOS.length) {
+        currentCategory = 'ALL';
+        activeScenarios = [...ALL_SCENARIOS];
+
+        const targetIdx = activeScenarios.findIndex(item => Number(item.id) === requestedCase);
+        currentIndex = targetIdx !== -1 ? targetIdx : (requestedCase - 1);
+      } else {
+        currentIndex = 0;
+      }
+
+      loadScenario(currentIndex);
     };
+
   </script>
 </body>
 </html>
