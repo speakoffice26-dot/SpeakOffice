@@ -12,18 +12,22 @@
 // =============================================================================
 // Ganti nilai di bawah ini dengan kredensial dari Firebase Console proyek Anda:
 // (Buka https://console.firebase.google.com -> Buat Proyek -> Tambahkan Web App)
+
 const firebaseConfig = {
-  apiKey: "YOUR_FIREBASE_API_KEY_HERE",
-  authDomain: "speakoffice-smk.firebaseapp.com",
-  projectId: "speakoffice-smk",
-  storageBucket: "speakoffice-smk.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890"
+  apiKey: "AIzaSyAzsGW9N1p1a1x1DD_3yg-BzPDANswjW4U",
+  authDomain: "speakoffice.firebaseapp.com",
+  projectId: "speakoffice",
+  storageBucket: "speakoffice.firebasestorage.app",
+  messagingSenderId: "880929150478",
+  appId: "1:880929150478:web:4ce9260e7c0bfa10b8ce5f",
+  measurementId: "G-JNRH5LC5GM"
 };
+
 
 // State koneksi Firebase
 let isFirebaseInitialized = false;
 let firestoreDb = null;
+let firebaseAuth = null;
 
 // Inisialisasi Firebase jika library Firebase SDK sudah dimuat di halaman
 (function initFirebase() {
@@ -33,6 +37,7 @@ let firestoreDb = null;
         firebase.initializeApp(firebaseConfig);
       }
       firestoreDb = firebase.firestore();
+      firebaseAuth = firebase.auth();
       isFirebaseInitialized = true;
       console.log("✅ [SPEAKOFFICE] Firebase Firestore berhasil diinisialisasi.");
     } else {
@@ -43,6 +48,121 @@ let firestoreDb = null;
     isFirebaseInitialized = false;
   }
 })();
+
+// =============================================================================
+// 3. AUTENTIKASI SISWA
+// =============================================================================
+
+
+async function registerStudent(email, password, studentData) {
+  try {
+    const userCredential = await firebaseAuth.createUserWithEmailAndPassword(
+      email,
+      password
+    );
+
+    const uid = userCredential.user.uid;
+
+    await firestoreDb.collection("students").doc(uid).set({
+      uid: uid,
+      email: email,
+      name: studentData.name,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    return {
+      success: true,
+      message: "Pendaftaran berhasil!"
+    };
+
+  } catch (error) {
+    console.error("Gagal mendaftar:", error);
+
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+}
+
+
+// =============================================================================
+// 4. INTEGRASI PROFIL SISWA DENGAN FIRESTORE
+// =============================================================================
+
+// Mengambil profil siswa berdasarkan UID akun yang sedang login
+async function getCurrentStudentProfile() {
+  try {
+    const user = firebaseAuth.currentUser;
+
+    if (!user) {
+      throw new Error("Siswa belum login.");
+    }
+
+    const doc = await firestoreDb
+      .collection("students")
+      .doc(user.uid)
+      .get();
+
+    if (!doc.exists) {
+      throw new Error("Data profil siswa tidak ditemukan.");
+    }
+
+    return {
+      success: true,
+      data: doc.data()
+    };
+
+  } catch (error) {
+    console.error("Gagal mengambil profil siswa:", error);
+
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+}
+
+
+// Menyimpan perubahan profil siswa berdasarkan UID
+async function updateCurrentStudentProfile(profileData) {
+  try {
+    const user = firebaseAuth.currentUser;
+
+    if (!user) {
+      throw new Error("Siswa belum login.");
+    }
+
+    const studentProfile = {
+      name: profileData.name || "",
+      studentClass: profileData.studentClass || "",
+      absent: profileData.absent || "",
+      school: profileData.school || "",
+      avatar: profileData.avatar || "👩‍💼",
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    await firestoreDb
+      .collection("students")
+      .doc(user.uid)
+      .set(studentProfile, { merge: true });
+
+    return {
+      success: true,
+      message: "Profil berhasil diperbarui!"
+    };
+
+  } catch (error) {
+    console.error("Gagal menyimpan profil siswa:", error);
+
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+}
+
+
 
 // =============================================================================
 // 2. DATA DUMMY AWAL (SEED DATA UNTUK DEMO DASHBOARD GURU)
@@ -120,14 +240,46 @@ window.SpeakOfficeDB = {
   /**
    * Menyimpan sesi data diri siswa saat pertama kali masuk
    */
-  saveStudentSession: function (data) {
-    if (data.name) localStorage.setItem('speakoffice_student_name', data.name.trim());
-    if (data.studentClass) localStorage.setItem('speakoffice_student_class', data.studentClass.trim());
-    if (data.absent) localStorage.setItem('speakoffice_student_absent', data.absent.toString().trim());
-    if (data.school) localStorage.setItem('speakoffice_student_school', data.school.trim());
-    if (data.avatar) localStorage.setItem('speakoffice_student_avatar', data.avatar);
-    return this.getStudentSession();
-  },
+  
+saveStudentSession: function (data) {
+  if (Object.prototype.hasOwnProperty.call(data, 'name')) {
+    localStorage.setItem(
+      'speakoffice_student_name',
+      (data.name || '').trim()
+    );
+  }
+
+  if (Object.prototype.hasOwnProperty.call(data, 'studentClass')) {
+    localStorage.setItem(
+      'speakoffice_student_class',
+      (data.studentClass || '').trim()
+    );
+  }
+
+  if (Object.prototype.hasOwnProperty.call(data, 'absent')) {
+    localStorage.setItem(
+      'speakoffice_student_absent',
+      String(data.absent || '').trim()
+    );
+  }
+
+  if (Object.prototype.hasOwnProperty.call(data, 'school')) {
+    localStorage.setItem(
+      'speakoffice_student_school',
+      (data.school || '').trim()
+    );
+  }
+
+  if (Object.prototype.hasOwnProperty.call(data, 'avatar')) {
+    localStorage.setItem(
+      'speakoffice_student_avatar',
+      data.avatar || '👩‍💼'
+    );
+  }
+
+  return this.getStudentSession();
+},
+
 
   /**
    * Mengambil sesi data diri siswa yang sedang aktif
@@ -194,88 +346,169 @@ window.SpeakOfficeDB = {
    *   predicate: string ('Sangat Kompeten' | 'Kompeten' | 'Perlu Latihan')
    * }
    */
-  saveStudentActivity: async function (activityData) {
+  
+
+saveStudentActivity: async function (activityData) {
+  try {
+    const user = firebaseAuth?.currentUser;
+
+    if (!user || !firestoreDb) {
+      throw new Error("Siswa belum login atau Firebase belum terhubung.");
+    }
+
+    const uid = user.uid;
     const now = new Date();
-    const formattedDate = now.getFullYear() + "-" +
+
+    const formattedDate =
+      now.getFullYear() + "-" +
       String(now.getMonth() + 1).padStart(2, '0') + "-" +
       String(now.getDate()).padStart(2, '0') + " " +
       String(now.getHours()).padStart(2, '0') + ":" +
       String(now.getMinutes()).padStart(2, '0') + ":" +
       String(now.getSeconds()).padStart(2, '0');
+   
+const record = {
+  id: "act-" + Date.now(),
+  uid: uid,
+  studentName: activityData.studentName || localStorage.getItem('speakoffice_student_name') || "",
+  studentClass: activityData.studentClass || localStorage.getItem('speakoffice_student_class') || "",
+  studentAbsent: activityData.studentAbsent || localStorage.getItem('speakoffice_student_absent') || "-",
+  category: activityData.category || "Interactive Case Study",
+  score: Number(activityData.score) || 0,
+  totalQuestions: activityData.totalQuestions || 0,
+  correctAnswers: activityData.correctAnswers || 0,
+  predicate: activityData.predicate || "",
+  timestamp: formattedDate
+};
 
-    const record = {
-      id: "act-" + Date.now(),
-      studentName: activityData.studentName || localStorage.getItem('speakoffice_student_name') || "Siswa SpeakOffice",
-      studentClass: activityData.studentClass || localStorage.getItem('speakoffice_student_class') || "Kelas XI MP",
-      studentAbsent: activityData.studentAbsent || localStorage.getItem('speakoffice_student_absent') || "-",
-      category: activityData.category || "Interactive Case Study",
-      score: typeof activityData.score === 'number' ? activityData.score : 0,
-      totalQuestions: activityData.totalQuestions || 0,
-      correctAnswers: activityData.correctAnswers || 0,
-      predicate: activityData.predicate || (activityData.score >= 85 ? "Sangat Kompeten" : activityData.score >= 75 ? "Kompeten" : "Perlu Latihan"),
-      timestamp: formattedDate
-    };
 
-    // 1. Simpan ke LocalStorage (selalu tersimpan sebagai cache lokal)
+    // Simpan ke Firestore collection terpisah
+    const docRef = await firestoreDb
+      .collection("student_activities")
+      .add(record);
+
+    // Cache lokal berdasarkan UID
+    const cacheKey = "speakoffice_activity_logs_" + uid;
+
     let logs = [];
     try {
-      const raw = localStorage.getItem('speakoffice_activity_logs');
-      logs = raw ? JSON.parse(raw) : [];
+      logs = JSON.parse(localStorage.getItem(cacheKey) || "[]");
+      if (!Array.isArray(logs)) logs = [];
     } catch (e) {
       logs = [];
     }
-    logs.unshift(record); // Tambahkan di baris teratas (paling baru)
-    localStorage.setItem('speakoffice_activity_logs', JSON.stringify(logs));
 
-    // 2. Simpan ke Firebase Firestore jika sudah terhubung
-    if (isFirebaseInitialized && firestoreDb) {
-      try {
-        await firestoreDb.collection("student_activities").add(record);
-        console.log("☁️ [SPEAKOFFICE] Berhasil merekam aktivitas ke Firebase Firestore:", record);
-        return { success: true, mode: 'firebase', data: record };
-      } catch (err) {
-        console.warn("⚠️ Gagal sync ke Firestore, data tersimpan di LocalStorage:", err.message);
-        return { success: true, mode: 'local', data: record };
-      }
-    }
+    logs.unshift({
+      id: docRef.id,
+      ...record
+    });
 
-    return { success: true, mode: 'local', data: record };
-  },
+    localStorage.setItem(cacheKey, JSON.stringify(logs));
+
+    console.log(
+      "Aktivitas berhasil disimpan berdasarkan UID:",
+      uid
+    );
+
+    return {
+      success: true,
+      mode: "firebase",
+      data: record
+    };
+
+  } catch (error) {
+    console.error("Gagal menyimpan aktivitas siswa:", error);
+
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+},
+
 
   /**
    * Mengambil seluruh daftar aktivitas siswa (dengan opsi filter kelas)
    */
-  getStudentActivities: async function (classFilter = "") {
-    // Jika Firebase Firestore aktif, coba ambil data terbaru dari cloud
-    if (isFirebaseInitialized && firestoreDb) {
-      try {
-        let query = firestoreDb.collection("student_activities").orderBy("timestamp", "desc");
-        if (classFilter && classFilter !== "all") {
-          query = query.where("studentClass", "==", classFilter);
-        }
-        const snapshot = await query.get();
-        const cloudData = [];
-        snapshot.forEach(doc => cloudData.push({ id: doc.id, ...doc.data() }));
-        if (cloudData.length > 0) {
-          return cloudData;
-        }
-      } catch (err) {
-        console.warn("⚠️ Gagal mengambil dari Firestore, fallback ke LocalStorage:", err.message);
-      }
-    }
+  
 
-    // Fallback: Membaca dari LocalStorage
-    try {
-      const raw = localStorage.getItem('speakoffice_activity_logs');
-      let data = raw ? JSON.parse(raw) : [];
-      if (classFilter && classFilter !== "all") {
-        data = data.filter(item => item.studentClass.toLowerCase() === classFilter.toLowerCase());
-      }
-      return data;
-    } catch (e) {
+getStudentActivities: async function (classFilter = "") {
+  try {
+    const user = firebaseAuth?.currentUser;
+
+    if (!user || !firestoreDb) {
       return [];
     }
-  },
+
+    const snapshot = await firestoreDb
+      .collection("student_activities")
+      .where("uid", "==", user.uid)
+      .get();
+
+    let data = [];
+
+    snapshot.forEach(doc => {
+      data.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    data.sort((a, b) =>
+      (b.timestamp || "").localeCompare(a.timestamp || "")
+    );
+
+    if (classFilter && classFilter !== "all") {
+      data = data.filter(item =>
+        (item.studentClass || "").toLowerCase() ===
+        classFilter.toLowerCase()
+      );
+    }
+
+    return data;
+
+  } catch (error) {
+    console.error("Gagal mengambil riwayat aktivitas:", error);
+    return [];
+  }
+},
+
+
+getAllStudentActivitiesForTeacher: async function () {
+  try {
+    if (!isFirebaseInitialized || !firestoreDb) {
+      throw new Error("Firebase belum terhubung.");
+    }
+
+    const snapshot = await firestoreDb
+      .collection("student_activities")
+      .get();
+
+    const data = [];
+
+    snapshot.forEach(doc => {
+      data.push({
+        id: doc.id,
+        ...doc.data()
+      });
+    });
+
+    data.sort((a, b) =>
+      (b.timestamp || "").localeCompare(a.timestamp || "")
+    );
+
+    return data;
+
+  } catch (error) {
+    console.error(
+      "Gagal mengambil seluruh aktivitas siswa:",
+      error
+    );
+
+    return [];
+  }
+},
+
 
   /**
    * Ekspor seluruh data aktivitas siswa ke format file CSV (kompatibel Excel dengan UTF-8 BOM)

@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Siswa - SpeakOffice</title>
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #EEF4FF, #F8FAFC);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .login-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 45px 20px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: #fff;
+      padding: 38px 35px;
+      border-radius: 22px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 12px 40px rgba(10, 30, 94, 0.09);
+    }
+
+    .login-logo {
+      display: block;
+      height: 58px;
+      max-width: 200px;
+      object-fit: contain;
+      margin: 0 auto 25px;
+    }
+
+    .login-card h1 {
+      color: #0A1E5E;
+      font-size: 1.65rem;
+      text-align: center;
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .login-subtitle {
+      color: #64748B;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 19px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #334155;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px 15px;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 11px;
+      font-size: 0.95rem;
+      outline: none;
+      background: #F8FAFC;
+    }
+
+    .form-group input:focus {
+      border-color: #2563EB;
+      background: #fff;
+    }
+
+    .login-button {
+      width: 100%;
+      border: none;
+      border-radius: 11px;
+      padding: 14px;
+      background: #0A1E5E;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .login-button:hover {
+      background: #1D4ED8;
+    }
+
+    .login-button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    #message {
+      text-align: center;
+      font-size: 0.88rem;
+      margin-top: 17px;
+      line-height: 1.5;
+    }
+
+    .register-link {
+      text-align: center;
+      color: #64748B;
+      font-size: 0.9rem;
+      margin-top: 22px;
+    }
+
+    .register-link a {
+      color: #2563EB;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .login-footer {
+      text-align: center;
+      color: #64748B;
+      font-size: 0.82rem;
+      padding: 18px;
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 30px 23px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="login-wrapper">
+    <section class="login-card">
+
+      <img src="../assets/logobesar.png"
+           alt="Logo SpeakOffice"
+           class="login-logo">
+
+      <h1>Selamat Datang Kembali!</h1>
+
+      <p class="login-subtitle">
+        Masuk ke akunmu untuk melanjutkan pembelajaran di SpeakOffice.
+      </p>
+
+      <form id="loginForm">
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Masukkan email"
+            autocomplete="email"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Masukkan password"
+            autocomplete="current-password"
+            required>
+        </div>
+
+        <button type="submit" class="login-button" id="loginButton">
+          Masuk
+        </button>
+
+      </form>
+
+      <p id="message" role="status"></p>
+
+      <p class="register-link">
+        Belum punya akun?
+        <a href="register.html">Daftar di sini</a>
+      </p>
+
+    </section>
+  </main>
+
+  <footer class="login-footer">
+    SpeakOffice &copy; 2026 - Media Pembelajaran Komunikasi & Etika Perkantoran
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const button = document.getElementById("loginButton");
+      const message = document.getElementById("message");
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      button.disabled = true;
+      button.textContent = "Memproses...";
+      message.textContent = "";
+
+      try {
+        await firebaseAuth.signInWithEmailAndPassword(email, password);
+
+        message.textContent = "Login berhasil!";
+        message.style.color = "#059669";
+
+        window.location.href = "../index.html";
+
+      } catch (error) {
+        console.error("Gagal login:", error);
+
+        message.textContent =
+          error.code === "auth/invalid-credential"
+            ? "Email atau password salah."
+            : "Login gagal. Silakan coba kembali.";
+
+        message.style.color = "#DC2626";
+
+      } finally {
+        button.disabled = false;
+        button.textContent = "Masuk";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -418,46 +418,71 @@
     </div>
   </div>
 
-  <!-- PIN ACCESS GATEWAY (MODAL PENGAMAN GURU - RAHASIA & BERANIMASI) -->
-  <div id="pinOverlay">
-    <div class="pin-auth-card" id="pinCardBox">
-      
-      <!-- Avatar Guru Animatif (Melayang Lembut) -->
-      <div class="pin-avatar-circle" title="Mode Guru Terverifikasi">
-        👨‍🏫
-      </div>
-      
-      <h3 style="font-size: 1.45rem; color: #0A1E5E; margin: 0 0 6px 0; font-weight: 800;">
-        Autentikasi Mode Guru
-      </h3>
-      <p style="font-size: 0.88rem; color: #64748B; margin: 0 0 22px 0; line-height: 1.55;">
-        Halaman ini khusus untuk Pengajar/Guru SMK guna memantau perkembangan kompetensi & rekap nilai siswa.
-      </p>
+  
+<!-- LOGIN GURU SPEAKOFFICE -->
+<div id="pinOverlay">
+  <div class="pin-auth-card" id="pinCardBox">
 
-      <div style="margin-bottom: 18px; text-align: left;">
-        <label for="inputPin" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 8px;">
-          Masukkan PIN Keamanan Guru:
-        </label>
-        <input type="password" id="inputPin" class="pin-input-field" placeholder="••••••••" onkeyup="if(event.key==='Enter') verifyTeacherPin()">
-      </div>
-
-      <!-- Pesan Error Animatif -->
-      <div id="pinErrorMsg" style="display: none; background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; margin-bottom: 18px;">
-        ⚠️ PIN Salah! Akses ditolak. Silakan coba lagi.
-      </div>
-
-      <!-- Tombol Kembali & Buka Dashboard yang Selaras & Proporsional -->
-      <div style="display: flex; gap: 12px; align-items: center;">
-        <a href="../index.html" class="btn-auth-back" title="Kembali ke Beranda" onclick="if(history.length > 1) { history.back(); return false; }">
-          <span>←</span> Kembali
-        </a>
-        <button id="btnSubmitPin" onclick="verifyTeacherPin()" class="btn-auth-submit">
-          <span>Buka Dashboard</span> <span>🚀</span>
-        </button>
-      </div>
-
+    <div class="pin-avatar-circle" title="Login Guru">
+      👨‍🏫
     </div>
+
+    <h3 style="font-size: 1.45rem; color: #0A1E5E; margin: 0 0 6px 0; font-weight: 800;">
+      Login Guru SpeakOffice
+    </h3>
+
+    <p style="font-size: 0.88rem; color: #64748B; margin: 0 0 22px 0; line-height: 1.55;">
+      Masuk menggunakan akun resmi guru untuk memantau perkembangan kompetensi dan rekap nilai siswa.
+    </p>
+
+    <div style="margin-bottom: 14px; text-align: left;">
+      <label for="teacherEmail" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 8px;">
+        Email Guru:
+      </label>
+      <input
+        type="email"
+        id="teacherEmail"
+        class="pin-input-field"
+        placeholder="Masukkan email guru"
+        autocomplete="username"
+        onkeyup="if(event.key==='Enter') verifyTeacherLogin()"
+      >
+    </div>
+
+    <div style="margin-bottom: 18px; text-align: left;">
+      <label for="teacherPassword" style="display: block; font-size: 0.82rem; font-weight: 700; color: #334155; margin-bottom: 8px;">
+        Password:
+      </label>
+      <input
+        type="password"
+        id="teacherPassword"
+        class="pin-input-field"
+        placeholder="Masukkan password"
+        autocomplete="current-password"
+        onkeyup="if(event.key==='Enter') verifyTeacherLogin()"
+      >
+    </div>
+
+    <div id="pinErrorMsg" style="display: none; background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; font-weight: 700; margin-bottom: 18px;">
+      ⚠️ Email atau password tidak valid.
+    </div>
+
+    <div style="display: flex; gap: 12px; align-items: center;">
+      <a href="../index.html" class="btn-auth-back" title="Kembali ke Beranda">
+        <span>←</span> Kembali
+      </a>
+
+      <button
+        id="btnSubmitPin"
+        onclick="verifyTeacherLogin()"
+        class="btn-auth-submit"
+      >
+        <span>Masuk Dashboard</span> <span>🚀</span>
+      </button>
+    </div>
+
   </div>
+</div>
 
   <!-- TOP NAVIGATION BAR -->
   <header class="navbar">
@@ -652,63 +677,150 @@
   </footer>
 
   <!-- SCRIPT DATABASE & LOGIKA DASHBOARD GURU -->
+  
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="../js/firebase-config.js"></script>
+
   <script>
     const VALID_PINS = ["12GURU34", "123456"];
     let currentLogs = [];
 
-    // FUNGSI CEK AUTENTIKASI PIN
-    function checkTeacherAuth() {
-      const isAuth = sessionStorage.getItem('speakoffice_teacher_auth');
-      const pinOverlay = document.getElementById('pinOverlay');
-      if (isAuth === 'true') {
-        pinOverlay.style.display = 'none';
-        loadDashboardData();
-      } else {
-        pinOverlay.style.display = 'flex';
-        setTimeout(() => document.getElementById('inputPin').focus(), 100);
+    
+// UID AKUN GURU YANG DIIZINKAN
+const TEACHER_UID = "PKM4y6Op8nbzllaa3e2LilAOC3o1";
+
+// CEK AUTENTIKASI FIREBASE GURU
+function checkTeacherAuth() {
+  const auth = firebase.auth();
+  const pinOverlay = document.getElementById('pinOverlay');
+
+  auth.onAuthStateChanged(async function(user) {
+    if (user && user.uid === TEACHER_UID) {
+      pinOverlay.style.display = 'none';
+
+      document.getElementById('teacherEmail').value = user.email || "";
+
+      loadDashboardData();
+
+    } else {
+      if (user) {
+        await auth.signOut();
       }
+
+      pinOverlay.style.display = 'flex';
+
+      setTimeout(() => {
+        document.getElementById('teacherEmail').focus();
+      }, 100);
+    }
+  });
+}
+
+
+// LOGIN GURU MENGGUNAKAN FIREBASE AUTHENTICATION
+async function verifyTeacherLogin() {
+  const emailInput = document.getElementById('teacherEmail');
+  const passwordInput = document.getElementById('teacherPassword');
+  const err = document.getElementById('pinErrorMsg');
+  const card = document.getElementById('pinCardBox');
+  const btn = document.getElementById('btnSubmitPin');
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!email || !password) {
+    err.innerText = "Email dan password wajib diisi.";
+    err.style.display = 'block';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = "<span>Memverifikasi...</span> <span>⏳</span>";
+  err.style.display = 'none';
+
+  try {
+    const auth = firebase.auth();
+
+    const credential = await auth.signInWithEmailAndPassword(
+      email,
+      password
+    );
+
+    const user = credential.user;
+
+    // Pastikan akun yang login adalah akun guru resmi
+    if (!user || user.uid !== TEACHER_UID) {
+      await auth.signOut();
+
+      throw new Error(
+        "Akun ini tidak memiliki akses Dashboard Guru."
+      );
     }
 
-    function verifyTeacherPin() {
-      const input = document.getElementById('inputPin');
-      const pin = input.value.trim();
-      const err = document.getElementById('pinErrorMsg');
-      const card = document.getElementById('pinCardBox');
-      const btn = document.getElementById('btnSubmitPin');
-      
-      if (VALID_PINS.includes(pin)) {
-        err.style.display = 'none';
-        btn.innerHTML = `<span>Terverifikasi!</span> <span>✓</span>`;
-        btn.style.background = 'linear-gradient(135deg, #10B981 0%, #059669 100%)';
-        btn.style.boxShadow = '0 6px 20px rgba(16, 185, 129, 0.4)';
-        
-        sessionStorage.setItem('speakoffice_teacher_auth', 'true');
-        setTimeout(() => {
-          const overlay = document.getElementById('pinOverlay');
-          overlay.style.opacity = '0';
-          setTimeout(() => {
-            overlay.style.display = 'none';
-            overlay.style.opacity = '1';
-            showToast("Selamat Datang, Guru!", "Dashboard pengajar siap digunakan.", "👨‍🏫");
-            loadDashboardData();
-          }, 280);
-        }, 350);
-      } else {
-        err.style.display = 'block';
-        if (card) {
-          card.classList.remove('shake-error');
-          void card.offsetWidth; // Trigger reflow
-          card.classList.add('shake-error');
-        }
-        input.select();
-      }
+    passwordInput.value = "";
+
+    btn.innerHTML = "<span>Berhasil!</span> <span>✓</span>";
+
+    // Dashboard akan dibuka oleh onAuthStateChanged
+
+  } catch (error) {
+    console.error("Login guru gagal:", error);
+
+    let message = "Login gagal. Periksa email dan password.";
+
+    if (error.message.includes("tidak memiliki akses")) {
+      message = error.message;
+    } else if (
+      error.code === "auth/invalid-credential" ||
+      error.code === "auth/wrong-password" ||
+      error.code === "auth/user-not-found"
+    ) {
+      message = "Email atau password salah.";
+    } else if (error.code === "auth/too-many-requests") {
+      message = "Terlalu banyak percobaan. Coba lagi nanti.";
+    } else if (error.code === "auth/network-request-failed") {
+      message = "Koneksi internet bermasalah.";
     }
 
-    function exitTeacherMode() {
-      sessionStorage.removeItem('speakoffice_teacher_auth');
-      window.location.href = "../index.html";
+    err.innerText = "⚠️ " + message;
+    err.style.display = 'block';
+
+    if (card) {
+      card.classList.remove('shake-error');
+      void card.offsetWidth;
+      card.classList.add('shake-error');
     }
+
+    passwordInput.select();
+
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = "<span>Masuk Dashboard</span> <span>🚀</span>";
+  }
+}
+
+
+// LOGOUT GURU
+async function exitTeacherMode() {
+  try {
+    await firebase.auth().signOut();
+
+    sessionStorage.removeItem('speakoffice_teacher_auth');
+
+    window.location.href = "../index.html";
+
+  } catch (error) {
+    console.error("Logout guru gagal:", error);
+    showToast(
+      "Logout Gagal",
+      "Silakan coba keluar kembali.",
+      "⚠️"
+    );
+  }
+}
+
 
     // FUNGSI NOTIFIKASI TOAST DALAM WEBSITE
     function showToast(title, desc, icon = "ℹ️") {
@@ -724,69 +836,53 @@
     }
 
     // MEMUAT DATA DARI SPEAKOFFICE DB (+ FALLBACK DARI JAWABAN KASUS TERJAWAB)
-    function loadDashboardData() {
-      const logs = window.SpeakOfficeDB.getStudentActivitiesSync();
+    
+// MEMUAT SELURUH AKTIVITAS SISWA DARI FIRESTORE UNTUK GURU
+async function loadDashboardData() {
+  try {
+    console.log("[DASHBOARD] Mengambil seluruh aktivitas siswa dari Firestore...");
 
-      if (Array.isArray(logs) && logs.length > 0) {
-        currentLogs = logs;
-      } else {
-        let answeredMap = {};
-        try {
-          answeredMap = JSON.parse(localStorage.getItem('speakoffice_answered_cases') || '{}');
-        } catch (e) {
-          answeredMap = {};
-        }
-
-        const answeredIds = new Set(
-          Object.keys(answeredMap)
-            .map(k => parseInt(String(k).match(/\d+/)?.[0], 10))
-            .filter(n => !isNaN(n))
-        );
-
-        const session = typeof window.SpeakOfficeDB.getStudentSession === 'function'
-          ? window.SpeakOfficeDB.getStudentSession()
-          : {};
-
-        const now = new Date();
-        const nowStr = now.getFullYear() + "-" +
-          String(now.getMonth() + 1).padStart(2, '0') + "-" +
-          String(now.getDate()).padStart(2, '0') + " " +
-          String(now.getHours()).padStart(2, '0') + ":" +
-          String(now.getMinutes()).padStart(2, '0') + ":" +
-          String(now.getSeconds()).padStart(2, '0');
-
-        const categoryDefs = [
-          { name: "Menerima Tamu & Janji Temu", ids: [1, 2, 3, 4, 5] },
-          { name: "Etika Telepon & Korespondensi Bisnis", ids: [6, 7, 8, 9, 10] },
-          { name: "Pelayanan Prima & Penanganan Keluhan", ids: [11, 12, 13, 14, 15] }
-        ];
-
-        const generatedRows = [];
-        categoryDefs.forEach(cat => {
-          const answeredInCat = cat.ids.filter(id => answeredIds.has(id));
-          if (answeredInCat.length === 0) return;
-
-          const correctInCat = answeredInCat.filter(id => answeredMap[String(id)]?.correct === true).length;
-          const score = Math.round((correctInCat / answeredInCat.length) * 100);
-          const predicate = score >= 85 ? "Sangat Kompeten" : score >= 75 ? "Kompeten" : "Perlu Latihan";
-          const isComplete = answeredInCat.length === cat.ids.length;
-
-          generatedRows.push({
-            timestamp: nowStr,
-            studentName: session.name || "Siswa SpeakOffice",
-            studentClass: session.studentClass || "XI MP 1",
-            studentAbsent: session.absent || "-",
-            category: isComplete ? cat.name : `${cat.name} (${answeredInCat.length}/${cat.ids.length} Soal)`,
-            score: score,
-            predicate: predicate
-          });
-        });
-
-        currentLogs = generatedRows;
-      }
-
-      applyFilters();
+    if (
+      !window.SpeakOfficeDB ||
+      typeof window.SpeakOfficeDB.getAllStudentActivitiesForTeacher !== "function"
+    ) {
+      throw new Error("Fungsi getAllStudentActivitiesForTeacher belum tersedia.");
     }
+
+    // Ambil seluruh aktivitas dari collection student_activities
+    const logs = await window.SpeakOfficeDB.getAllStudentActivitiesForTeacher();
+
+    // Pastikan hasil berupa array
+    currentLogs = Array.isArray(logs) ? logs : [];
+
+    console.log("[DASHBOARD] Total aktivitas ditemukan:", currentLogs.length);
+    console.log("[DASHBOARD] Data aktivitas:", currentLogs);
+
+    // Terapkan filter dan tampilkan tabel
+    applyFilters();
+
+    if (currentLogs.length === 0) {
+      showToast(
+        "Data Belum Ditemukan",
+        "Belum ada aktivitas siswa yang berhasil diambil dari Firestore.",
+        "⚠️"
+      );
+    }
+
+  } catch (error) {
+    console.error("[DASHBOARD] Gagal memuat aktivitas:", error);
+
+    currentLogs = [];
+    applyFilters();
+
+    showToast(
+      "Gagal Memuat Data",
+      error.message,
+      "⚠️"
+    );
+  }
+}
+
 
     // FILTER & SEARCH REAL-TIME
     function applyFilters() {
@@ -911,11 +1007,16 @@
       }
     }
 
-    // REFRESH DATA
-    function refreshData() {
-      loadDashboardData();
-      showToast("Data Diperbarui", "Tabel aktivitas siswa telah diperbarui.", "🔄");
-    }
+    // REFRESH DATA  
+async function refreshData() {
+  await loadDashboardData();
+
+  showToast(
+    "Data Diperbarui",
+    "Data aktivitas siswa telah dimuat ulang dari Firestore.",
+    "🔄"
+  );
+}
 
     // RESET DATA (MENGHAPUS REKAP GURU SEKALIGUS PROGRES KASUS SISWA AGAR BISA DIULANG)
     function confirmResetData() {

@@ -576,6 +576,14 @@
           <span style="position: absolute; top: 1px; right: 1px; width: 10px; height: 10px; background: #22c55e; border: 2px solid #fff; border-radius: 50%;"></span>
         </a>
 
+<button
+  id="btnStudentLogout"
+  onclick="logoutStudent()"
+  style="background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; padding: 9px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap;">
+  🚪 Keluar
+</button>
+
+
       </div>
     </div>
   </header>
@@ -810,6 +818,9 @@
   </footer>
 
   <!-- SCRIPT LOGIKA TOAST, DATABASE & PROFILE -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="../js/firebase-config.js"></script>
   <script>
     let tempSelectedGender = 'female';
@@ -1312,25 +1323,61 @@
       document.getElementById('editModal').style.display = 'none';
     }
 
-    function saveStudentProfile() {
-      const newName = document.getElementById('inputName').value.trim();
-      const newClass = document.getElementById('inputClass').value.trim();
-      const newAbsent = document.getElementById('inputAbsent').value.trim();
-      const newSchool = document.getElementById('inputSchool').value.trim();
-      const finalAvatar = tempSelectedGender === 'female' ? '👩‍💼' : '👨‍💼';
+    
+async function saveStudentProfile() {
+  const newName = document.getElementById('inputName').value.trim();
+  const newClass = document.getElementById('inputClass').value.trim();
+  const newAbsent = document.getElementById('inputAbsent').value.trim();
+  const newSchool = document.getElementById('inputSchool').value.trim();
+  const finalAvatar = tempSelectedGender === 'female' ? '👩‍💼' : '👨‍💼';
 
-      window.SpeakOfficeDB.saveStudentSession({
-        name: newName,
-        studentClass: newClass,
-        absent: newAbsent,
-        school: newSchool,
-        avatar: finalAvatar
-      });
+  // Pastikan siswa sudah login
+  const user = firebaseAuth.currentUser;
 
-      closeEditModal();
-      loadSavedProfile();
-      showToastNotification("Berhasil Disimpan!", "Data diri siswa berhasil diperbarui.");
-    }
+  if (!user) {
+    showToastNotification(
+      "Gagal Menyimpan!",
+      "Silakan login kembali terlebih dahulu."
+    );
+    return;
+  }
+
+  // Simpan perubahan ke Firestore berdasarkan UID
+  const result = await updateCurrentStudentProfile({
+    name: newName,
+    studentClass: newClass,
+    absent: newAbsent,
+    school: newSchool,
+    avatar: finalAvatar
+  });
+
+  // Jika gagal menyimpan, jangan tutup modal
+  if (!result.success) {
+    showToastNotification(
+      "Gagal Menyimpan!",
+      result.message
+    );
+    return;
+  }
+
+  // Jika berhasil, perbarui penyimpanan lokal lama
+  window.SpeakOfficeDB.saveStudentSession({
+    name: newName,
+    studentClass: newClass,
+    absent: newAbsent,
+    school: newSchool,
+    avatar: finalAvatar
+  });
+
+  closeEditModal();
+  loadSavedProfile();
+
+  showToastNotification(
+    "Berhasil Disimpan!",
+    "Data diri siswa berhasil diperbarui."
+  );
+}
+
 
     // =========================================================================
     // MODAL PIN GURU
@@ -1403,15 +1450,121 @@
         btnHistory.hidden = !allowed;
       }
     }
+    
+
+// =====================================================
+// MEMUAT PROFIL SISWA DARI FIRESTORE BERDASARKAN UID
+// =====================================================
+
+async function loadFirebaseStudentProfile(user) {
+  try {
+    const result = await getCurrentStudentProfile();
+
+    if (!result.success) {
+      console.error("Gagal memuat profil:", result.message);
+      showToastNotification(
+        "Gagal Memuat Profil",
+        "Data profil belum berhasil diambil dari Firebase."
+      );
+      return;
+    }
+
+    const profile = result.data;
+
+    // Sinkronkan data Firebase ke penyimpanan lokal lama
+    window.SpeakOfficeDB.saveStudentSession({
+      name: profile.name || "",
+      studentClass: profile.studentClass || "",
+      absent: profile.absent || "",
+      school: profile.school || "SMK Negeri 1 Jakarta",
+      avatar: profile.avatar || "👩‍💼"
+    });
+
+    // Jalankan kembali fungsi profil lama
+    loadSavedProfile();
+
+    console.log("Profil siswa berhasil dimuat:", user.uid);
+
+  } catch (error) {
+    console.error("Kesalahan memuat profil:", error);
+  }
+}
+
+
+async function logoutStudent() {
+  const btn = document.getElementById('btnStudentLogout');
+
+  try {
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Memproses...';
+    }
+
+    // Logout dari Firebase Authentication
+    await firebaseAuth.signOut();
+
+    // Bersihkan cache lokal akun siswa
+    const studentCacheKeys = [
+      'speakoffice_student_name',
+      'speakoffice_student_class',
+      'speakoffice_student_absent',
+      'speakoffice_student_school',
+      'speakoffice_student_avatar',
+      'speakoffice_student_session',
+      'speakoffice_activity_logs',
+      'speakoffice_answered_cases',
+      'speakoffice_completed_categories',
+      'speakoffice_logged_cat_TAMU',
+      'speakoffice_logged_cat_TELEPON',
+      'speakoffice_logged_cat_PELAYANAN',
+      'speakoffice_read_attire'
+    ];
+
+    studentCacheKeys.forEach(function(key) {
+      localStorage.removeItem(key);
+    });
+
+    // Arahkan kembali ke halaman Login
+    window.location.href = 'login.html';
+
+  } catch (error) {
+    console.error('Gagal logout:', error);
+
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = '🚪 Keluar';
+    }
+
+    showToastNotification(
+      'Logout Gagal!',
+      'Silakan coba kembali. ' + error.message
+    );
+  }
+}
+
 
     document.addEventListener('DOMContentLoaded', updateTeacherResetVisibility);
     window.addEventListener('pageshow', updateTeacherResetVisibility);
     window.addEventListener('focus', updateTeacherResetVisibility);
 
-    window.onload = () => {
-      loadSavedProfile();
-      updateTeacherResetVisibility();
-    };
+    
+window.onload = () => {
+  updateTeacherResetVisibility();
+
+  firebaseAuth.onAuthStateChanged(async (user) => {
+
+    // Jika belum login, arahkan ke halaman Login
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    // Jika sudah login, ambil profil berdasarkan UID
+    await loadFirebaseStudentProfile(user);
+
+  });
+};
+
   </script>
 </body>
 </html>

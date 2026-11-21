@@ -1,0 +1,237 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Akun - SpeakOffice</title>
+  <link rel="stylesheet" href="../css/style.css">
+
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #EEF4FF, #F8FAFC);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .register-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 45px 20px;
+    }
+
+    .register-card {
+      width: 100%;
+      max-width: 440px;
+      background: #fff;
+      padding: 38px 35px;
+      border-radius: 22px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 12px 40px rgba(10, 30, 94, 0.09);
+    }
+
+    .register-logo {
+      display: block;
+      height: 58px;
+      width: auto;
+      max-width: 200px;
+      object-fit: contain;
+      margin: 0 auto 25px;
+    }
+
+    .register-card h1 {
+      color: #0A1E5E;
+      font-size: 1.65rem;
+      text-align: center;
+      margin: 0 0 8px;
+      font-weight: 800;
+    }
+
+    .register-subtitle {
+      color: #64748B;
+      font-size: 0.9rem;
+      text-align: center;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      margin-bottom: 19px;
+    }
+
+    .form-group label {
+      display: block;
+      color: #334155;
+      font-size: 0.88rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 13px 15px;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 11px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: 0.2s;
+      background: #F8FAFC;
+    }
+
+    .form-group input:focus {
+      border-color: #2563EB;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .register-button {
+      width: 100%;
+      border: none;
+      border-radius: 11px;
+      padding: 14px;
+      background: #0A1E5E;
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 5px;
+      transition: 0.2s;
+    }
+
+    .register-button:hover {
+      background: #1D4ED8;
+      transform: translateY(-1px);
+    }
+
+    .register-button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    #message {
+      text-align: center;
+      font-size: 0.88rem;
+      margin-top: 17px;
+      line-height: 1.5;
+    }
+
+    .register-footer {
+      text-align: center;
+      color: #64748B;
+      font-size: 0.82rem;
+      padding: 18px;
+    }
+
+    @media (max-width: 480px) {
+      .register-card {
+        padding: 30px 23px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="register-wrapper">
+    <section class="register-card">
+
+      <img src="../assets/logobesar.png"
+           alt="Logo SpeakOffice"
+           class="register-logo">
+
+      <h1>Buat Akun Siswa</h1>
+      <p class="register-subtitle">
+        Selamat datang di SpeakOffice!<br>
+        Daftarkan akunmu untuk mulai belajar.
+      </p>
+
+      <form id="registerForm">
+
+        <div class="form-group">
+          <label for="name">Nama Lengkap</label>
+          <input type="text" id="name"
+                 placeholder="Masukkan nama lengkap"
+                 autocomplete="name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email"
+                 placeholder="Masukkan email aktif"
+                 autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password"
+                 placeholder="Minimal 6 karakter"
+                 minlength="6"
+                 autocomplete="new-password" required>
+        </div>
+
+        <button type="submit" class="register-button" id="registerButton">
+          Daftar Sekarang
+        </button>
+
+      </form>
+
+      <p id="message" role="status"></p>
+
+    </section>
+  </main>
+
+  <footer class="register-footer">
+    SpeakOffice &copy; 2026 - Media Pembelajaran Komunikasi & Etika Perkantoran
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="../js/firebase-config.js"></script>
+
+  <script>
+    document.getElementById("registerForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const button = document.getElementById("registerButton");
+      const message = document.getElementById("message");
+
+      const studentData = {
+        name: document.getElementById("name").value.trim()
+      };
+
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      button.disabled = true;
+      button.textContent = "Memproses...";
+      message.textContent = "";
+
+      try {
+        const result = await registerStudent(email, password, studentData);
+
+        message.textContent = result.message;
+        message.style.color = result.success ? "#059669" : "#DC2626";
+
+      if (result.success) {
+       setTimeout(function() {
+        window.location.href = "login.html";
+       }, 1500);
+      }
+      } catch (error) {
+        message.textContent = "Terjadi kesalahan. Silakan coba kembali.";
+        message.style.color = "#DC2626";
+      } finally {
+        button.disabled = false;
+        button.textContent = "Daftar Sekarang";
+      }
+    });
+  </script>
+
+</body>
+</html>
